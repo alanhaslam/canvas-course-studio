@@ -6,7 +6,7 @@ It uses simple markup and a live preview to generate Canvas-ready HTML. Users ca
 
 ## Current version
 
-**v0.9.10**
+**v0.9.16**
 
 The current source is available in this repository as [`canvas_course_studio.html`](canvas_course_studio.html).
 
@@ -14,7 +14,7 @@ For the easiest download, use the repository's **Releases** section and download
 
 ## Preset levels
 
-Course Studio now supports four levels of visual complexity:
+Course Studio supports four levels of visual complexity:
 
 - **Canvas Native** — semantic structure with Canvas's default appearance
 - **Light** — restrained visual styling
@@ -30,9 +30,9 @@ Canvas Course Studio can:
 - generate Canvas-ready HTML from simple markup
 - preview pages while you work
 - support semantic H2, H3, and H4 heading structure
-- add callouts, lists, reminders, notes, and navigation
+- add callouts, lists, reminders, notes, contributor details, and navigation
 - use Canvas Native, Light, and Structured presets
-- expose richer layouts through optional Advanced features
+- expose richer layouts and preview editing through optional Advanced features
 - create, import, export, and remove custom templates
 - add optional DVC Green presets
 - save reusable top-of-page reminders and bottom-of-page notes
@@ -58,6 +58,12 @@ It does **not** connect to Canvas, ChatGPT, OpenAI, or another online service. C
 
 Course Studio also includes a **Load Sample Page** option for users who want to explore the markup and page components before creating their own page.
 
+## Advanced preview editing
+
+Advanced mode allows small text edits directly in the preview. **Import Preview Edits** translates those changes back into Course Studio markup.
+
+Preview import is approximate. Complex formatting or structural changes may be simplified, and importing replaces the current Course Studio markup with the translated preview. Review the Course Studio Body after importing and avoid making competing changes in both places before an import.
+
 ## Backups
 
 Course Studio stores custom templates, snippets, and preferences locally in the browser. They do not automatically follow users to another browser or computer.
@@ -70,6 +76,7 @@ Use **Backup → Export Full Backup** to create a dated JSON backup file. Store 
 - Course Studio does not publish directly to Canvas.
 - Internal Canvas links should be added or checked in Canvas after pasting the generated HTML.
 - The example **Back to Modules** link must be replaced with the appropriate link for the user's own Canvas course.
+- Contributor name and update date are page-specific and intentionally start blank on each launch.
 - Preview generated pages in Canvas before publishing because Canvas may handle some HTML or spacing differently from the local preview.
 - Keep headings semantic and sequential: H2 → H3 → H4.
 
