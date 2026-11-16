@@ -2,13 +2,26 @@
 
 **Canvas Course Studio** is a free, offline tool for creating consistent, accessible, and visually organized Canvas pages without requiring users to write HTML from scratch.
 
-It uses simple markup and a live preview to generate Canvas-ready HTML. Users can start with restrained built-in presets, create or import custom templates, save reusable reminders and notes, and enable more advanced layouts when needed.
+It uses simple markup and a live preview to generate Canvas-ready HTML. Users can start with Canvas-native structure, restrained built-in presets, create or import custom templates, save reusable reminders and notes, and enable more advanced layouts when needed.
 
-## Download
+## Current version
 
-The current release is **v0.9.8**.
+**v0.9.10**
 
-Use the repository's **Releases** section to download the current `canvas_course_studio_v0_9_8.html` file. Save the HTML file to your computer and open it in a modern web browser. No installation is required.
+The current source is available in this repository as [`canvas_course_studio.html`](canvas_course_studio.html).
+
+For the easiest download, use the repository's **Releases** section and download the versioned HTML release asset. Save the HTML file to your computer and open it in a modern web browser. No installation is required.
+
+## Preset levels
+
+Course Studio now supports four levels of visual complexity:
+
+- **Canvas Native** — semantic structure with Canvas's default appearance
+- **Light** — restrained visual styling
+- **Structured** — stronger visual separation between sections
+- **Advanced** — richer layouts and more layered HTML
+
+Canvas Native is intended for instructors who want help with page structure, markup, preview, snippets, and HTML generation without adding a separate visual theme.
 
 ## What it does
 
@@ -18,7 +31,7 @@ Canvas Course Studio can:
 - preview pages while you work
 - support semantic H2, H3, and H4 heading structure
 - add callouts, lists, reminders, notes, and navigation
-- use Light and Structured visual presets
+- use Canvas Native, Light, and Structured presets
 - expose richer layouts through optional Advanced features
 - create, import, export, and remove custom templates
 - add optional DVC Green presets
@@ -53,6 +66,7 @@ Use **Backup → Export Full Backup** to create a dated JSON backup file. Store 
 
 ## Canvas notes
 
+- Canvas supplies the page H1; Course Studio body content begins with H2.
 - Course Studio does not publish directly to Canvas.
 - Internal Canvas links should be added or checked in Canvas after pasting the generated HTML.
 - The example **Back to Modules** link must be replaced with the appropriate link for the user's own Canvas course.
@@ -70,3 +84,5 @@ Canvas Course Studio was developed using ChatGPT as an independent faculty tool 
 The software is licensed under the [MIT License](LICENSE).
 
 Documentation and sample content are licensed under **Creative Commons Attribution 4.0 International (CC BY 4.0)**.
+
+See [CHANGELOG.md](CHANGELOG.md) for release history.
