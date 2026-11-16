@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.9.16
+
+- Moved preview editing behind **Advanced** and renamed the action to **Import Preview Edits**.
+- Added clearer warnings that preview import is approximate and replaces the current Course Studio markup.
+- Added optional page-specific contributor details with **Contributed by** and **Last updated** fields.
+- Kept contributor metadata separate from the right-aligned **Back to Modules** navigation.
+- Added a light footer divider for Canvas Native and retained the heavier divider for themed presets.
+- Made launch behavior predictable: **Light — Teal** starts selected, Advanced starts off, and contributor details start off and blank.
+- Updated About, How to Use, and FAQ guidance for Canvas Native, Advanced preview editing, heading hierarchy, and contributor details.
+- Removed the bottom **Copy Canvas Title** button to keep output controls focused on generated Canvas HTML.
+
 ## v0.9.10
 
 - Added **Canvas Native**, a built-in structural mode that uses Canvas's default heading, paragraph, list, divider, and navigation appearance.
