@@ -1,0 +1,1534 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Canvas Course Studio 0.9.10 Release Candidate</title>
+<style>
+:root{--bg:#eef1f3;--panel:#fff;--text:#1f2933;--muted:#65727d;--border:#d9dee3;--accent:#2f7f7a;--dark:#3a4a57}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+header{background:var(--dark);color:#fff;padding:18px 24px}
+header h1{margin:0;font-size:24px}
+header p{margin:4px 0 0;color:#e3eaee;font-size:14px}
+.app{display:grid;grid-template-columns:minmax(360px,.95fr) minmax(500px,1.05fr);gap:18px;padding:18px}
+.panel{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.panel-head{padding:14px 16px;border-bottom:1px solid var(--border);font-weight:700}
+.panel-body{padding:16px}
+label{display:block;font-weight:700;margin:0 0 6px}
+select,input[type="text"],textarea{width:100%;border:1px solid #bfc7cd;border-radius:8px;padding:10px 11px;font:inherit;color:inherit;background:#fff}
+textarea{min-height:420px;resize:vertical;line-height:1.45}
+.field{margin-bottom:14px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;margin:6px 0 16px}
+.check{display:flex;gap:8px;align-items:flex-start;font-weight:500}
+.check input{margin-top:3px}
+button{border:0;border-radius:8px;padding:10px 14px;font:inherit;font-weight:700;cursor:pointer}
+.primary{background:var(--accent);color:#fff}
+.secondary{background:#e7ecef;color:#26343f}
+.danger{background:#f0e7e7;color:#6b2f2f}
+.actions,.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.toolbar{margin:8px 0 10px}
+.tabs{display:flex;border-bottom:1px solid var(--border);background:#f8fafb}
+.tab{background:transparent;border-radius:0;border-bottom:3px solid transparent;padding:12px 16px}
+.tab.active{border-bottom-color:var(--accent);color:var(--accent)}
+.view{display:none;padding:18px}
+.view.active{display:block}
+#previewWrap{height:620px;overflow:auto;border:1px solid #e3e7ea;border-radius:8px;background:#fff}
+#preview{min-height:100%;padding:16px;outline:none}
+#preview[contenteditable="true"]:focus{box-shadow:inset 0 0 0 2px rgba(47,127,122,.25)}
+#htmlOutput{width:100%;min-height:600px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;line-height:1.45}
+.note{margin-top:8px;color:var(--muted);font-size:13px}
+.status{margin-left:auto;color:var(--muted);font-size:13px}
+.title-preview{background:#f8fafb;border:1px dashed #bfc7cd;border-radius:8px;padding:10px 12px;margin-bottom:14px}
+.title-preview strong{display:block;margin-bottom:2px}
+.import-box{margin-top:10px;padding:12px;border:1px solid var(--border);border-radius:8px;background:#f8fafb}
+.import-box textarea{min-height:160px}
+.preview-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.preview-tools .check{margin-right:auto}
+.dirty{font-size:13px;color:#8a5a00}
+.hidden{display:none!important}
+.theme-builder{margin:2px 0 18px;padding:14px;border:1px solid var(--border);border-radius:10px;background:#f8fafb}
+.theme-builder h3{margin:0 0 6px;font-size:16px}
+.theme-builder .intro{margin:0 0 12px;color:var(--muted);font-size:13px}
+.color-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px}
+.color-field{display:grid;grid-template-columns:42px 1fr;gap:8px;align-items:center}
+.color-field input[type="color"]{width:42px;height:38px;padding:2px;border:1px solid #bfc7cd;border-radius:8px;background:#fff}
+.color-field input[type="text"]{padding:8px 9px}
+.template-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:end;margin-top:12px}
+.template-actions .field{margin:0;min-width:220px;flex:1}
+.access-box{margin-top:14px;padding:12px;border:1px solid var(--border);border-radius:8px;background:#fff}
+.access-head{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-bottom:8px}
+.access-summary{font-weight:700}
+.contrast-list{display:grid;gap:6px}
+.contrast-row{display:grid;grid-template-columns:minmax(180px,1fr) auto auto;gap:10px;align-items:center;font-size:13px}
+.pass{color:#17643a;font-weight:700}
+.fail{color:#9b2c2c;font-weight:700}
+.swatches{display:flex;gap:4px;align-items:center}
+.swatch{display:inline-block;width:18px;height:18px;border:1px solid #c8cdd2;border-radius:4px}
+.small-btn{padding:8px 10px}
+@media (max-width:700px){.color-grid{grid-template-columns:1fr}.contrast-row{grid-template-columns:1fr auto}}
+@media (max-width:980px){.app{grid-template-columns:1fr}.three{grid-template-columns:1fr}}
+.mode-tabs{display:flex;background:#fff;border-bottom:1px solid var(--border);padding:0 18px}
+.mode-tab{background:transparent;border-radius:0;border-bottom:3px solid transparent;padding:13px 18px}
+.mode-tab.active{border-bottom-color:var(--accent);color:var(--accent)}
+.mode-view{display:none}
+.mode-view.active{display:block}
+.template-app{display:grid;grid-template-columns:minmax(460px,.95fr) minmax(440px,1.05fr);gap:18px;padding:18px}
+.template-preview-wrap{background:#fff;border:1px solid #e3e7ea;border-radius:8px;padding:18px;min-height:560px}
+.template-preview-note{margin-bottom:12px;color:var(--muted);font-size:13px}
+@media (max-width:980px){.template-app{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Canvas Course Studio</h1>
+  <p>Release candidate 0.9.10 — Canvas Native template controls streamlined</p>
+</header>
+
+<nav class="mode-tabs" aria-label="Course Studio workspace">
+  <button class="mode-tab active" data-mode="buildMode" type="button">Build</button>
+  <button class="mode-tab" data-mode="templatesMode" type="button">Templates</button>
+  <button class="mode-tab" data-mode="snippetsMode" type="button">Snippets</button>
+  <button class="mode-tab" data-mode="backupMode" type="button">Backup</button>
+  <button class="mode-tab" data-mode="aboutMode" type="button">About</button>
+</nav>
+
+<div id="buildMode" class="mode-view active">
+<main class="app">
+<section class="panel">
+<div class="panel-head">Build Canvas content</div>
+<div class="panel-body">
+
+<div class="field">
+  <label for="theme">Theme preset</label>
+  <select id="theme">
+    <option value="canvasNative">Canvas Native</option>
+    <option value="lightTeal" selected>Light — Teal</option>
+    <option value="lightGraphite">Light — Graphite + Blue</option>
+    <option value="structuredTeal">Structured — Teal</option>
+    <option value="structuredGraphite">Structured — Graphite + Blue</option>
+  </select>
+  <div class="note" id="themeNote">Choose Canvas Native for minimally styled Canvas HTML, or start with one of four restrained visual presets. Advanced examples stay hidden unless you turn them on.</div>
+</div>
+
+<div class="field">
+  <label class="check"><input type="checkbox" id="advancedMode"> <span>Enable advanced features</span></label>
+  <div class="note" id="advancedBuildNote">Advanced features are off. Rich example presets, quote blocks, and advanced layout controls stay hidden until you turn them on.</div>
+</div>
+
+<div class="field">
+  <label for="title">Canvas title <span style="font-weight:500;color:var(--muted);">(optional)</span></label>
+  <input id="title" type="text">
+  <div class="note">Canvas supplies the H1. Keep the title here for easy copying; it is not inserted into the generated body HTML.</div>
+</div>
+
+<div class="field">
+  <label for="content">Course Studio body</label>
+
+  <div class="toolbar">
+    <button class="primary" id="loadSamplePage" type="button">Load Sample Page</button>
+    <button class="secondary" id="insertSection" type="button">H2 — Section</button>
+    <button class="secondary" id="insertH3" type="button">H3 — Subsection</button>
+    <button class="secondary" id="insertH4" type="button">H4 — Minor Heading</button>
+    <button class="secondary" id="insertCallout" type="button">Insert Callout</button>
+    <button class="secondary advanced-only hidden" id="insertMultiCallout" type="button">Insert Multi-Paragraph Callout</button>
+    <button class="secondary advanced-only hidden" id="insertQuote" type="button">Insert Quote Block</button>
+    <button class="secondary" id="insertBullets" type="button">Insert Bullet List</button>
+    <button class="secondary" id="insertTop" type="button">Insert Back to Top</button>
+    <button class="danger" id="clear" type="button">Clear</button>
+  </div>
+
+  <textarea id="content" placeholder="Use ## for H2 sections, ### for H3 subsections, #### for H4 minor headings, > for a quick callout, - for bullets, 1. for numbered lists, [top] for Back to top links, and -- for an em dash."></textarea>
+  <div class="note" id="contentSyntaxNote">`##` = H2 section · `###` = H3 subsection · `####` = H4 minor heading · `>` = quick callout · `-` = bullets · `1.` = numbered list · `[top]` = Back to top · `--` = em dash · `**bold**` = bold · `*italic*` = italics</div>
+</div>
+
+<div class="import-box">
+  <label for="canvasHtml">Import Canvas HTML</label>
+  <textarea id="canvasHtml" placeholder="Paste HTML from Canvas here, then click Convert to Course Studio."></textarea>
+  <div class="actions" style="margin-top:8px">
+    <button class="secondary" id="importHtml" type="button">Convert to Course Studio</button>
+    <span class="note">Best with Course Studio-style Canvas HTML; heading levels and common components are preserved.</span>
+  </div>
+</div>
+
+<label style="margin-top:14px">Options</label>
+<div class="checks">
+  <label class="check" id="sectionStyleOption"><input type="checkbox" id="cards" checked> <span id="sectionStyleLabel">Use enhanced section styling</span></label>
+  <label class="check"><input type="checkbox" id="qa"> Top-of-page reminder</label>
+  <label class="check"><input type="checkbox" id="transparency"> Bottom-of-page note</label>
+  <label class="check"><input type="checkbox" id="includeFooter" checked> Include footer</label>
+</div>
+<div class="two" style="margin-top:8px">
+  <div class="field" id="qaSnippetPicker">
+    <label for="qaSnippetSelect">Top-of-page reminder preset</label>
+    <select id="qaSnippetSelect"></select>
+    <div class="note">Saved top-of-page reminders appear here. Add or rename them in the Snippets workspace.</div>
+  </div>
+  <div class="field" id="transparencySnippetPicker">
+    <label for="transparencySnippetSelect">Bottom-of-page note preset</label>
+    <select id="transparencySnippetSelect"></select>
+    <div class="note">Saved bottom-of-page notes appear here. Add or rename them in the Snippets workspace.</div>
+  </div>
+</div>
+
+<div class="three">
+  <div class="field">
+    <label for="footerMode">Footer navigation</label>
+    <select id="footerMode">
+      <option value="modules" selected>Footer link only</option>
+      <option value="topmodules">↑ Back to top | Footer link</option>
+      <option value="none">None</option>
+    </select>
+  </div>
+  <div class="field">
+    <label for="modulesLabel">Footer link text</label>
+    <input id="modulesLabel" type="text" value="← Back to Modules">
+  </div>
+  <div class="field">
+    <label for="modulesUrl">Footer link URL</label>
+    <input id="modulesUrl" type="text" value="/courses">
+  </div>
+</div>
+
+<div class="actions">
+  <button class="primary" id="generate" type="button">Generate</button>
+  <button class="secondary" id="copyTitle" type="button">Copy Canvas Title</button>
+  <span class="status" id="status"></span>
+</div>
+
+</div>
+</section>
+
+<section class="panel">
+<div class="tabs">
+  <button class="tab active" data-tab="previewView" type="button">Preview</button>
+  <button class="tab" data-tab="htmlView" type="button">Canvas HTML</button>
+</div>
+
+<div id="previewView" class="view active">
+  <div class="title-preview">
+    <strong>Canvas title (separate field)</strong>
+    <span id="titlePreview">(untitled)</span>
+  </div>
+
+  <div class="preview-tools">
+    <label class="check"><input type="checkbox" id="syncScroll" checked> Sync scrolling</label>
+    <button class="secondary" id="applyPreview" type="button">Apply Preview Changes</button>
+    <span id="previewDirty" class="dirty hidden">Preview has unapplied edits</span>
+  </div>
+
+  <div id="previewWrap">
+    <div id="preview" contenteditable="true" aria-label="Editable Canvas preview"></div>
+  </div>
+  <div class="note">You can edit directly in the preview. Click <strong>Apply Preview Changes</strong> to convert those edits back into Course Studio markup.</div>
+</div>
+
+<div id="htmlView" class="view">
+  <div class="actions" style="margin-bottom:10px"><button class="primary" id="copyHtml" type="button">Copy HTML</button></div>
+  <textarea id="htmlOutput" spellcheck="false"></textarea>
+</div>
+</section>
+</main>
+</div>
+
+<div id="templatesMode" class="mode-view">
+<main class="template-app">
+  <section class="panel">
+    <div class="panel-head">Create or edit a template</div>
+    <div class="panel-body">
+<div class="theme-builder">
+  <h3>Template Creator</h3>
+  <p class="intro">Start with Canvas Native or one of the streamlined visual presets. Canvas Native keeps the generated HTML close to Canvas defaults; visual presets can be customized, checked for contrast, and saved as named templates. Built-in presets are never overwritten. Advanced rich examples stay hidden unless you turn them on.</p>
+  <div class="field">
+    <label class="check"><input type="checkbox" id="advancedTemplatesToggle"> <span>Enable advanced features in Template Creator</span></label>
+    <div class="note">Keep this off for a lighter release workflow. Turn it on to expose rich example presets and Rich complexity.</div>
+  </div>
+  <div class="field">
+    <label for="templateTheme">Base preset / template</label>
+    <select id="templateTheme"></select>
+    <div class="note" id="templateThemeNote"></div>
+  </div>
+  <div class="two">
+    <div class="field">
+      <label for="complexity">Complexity</label>
+      <select id="complexity"><option>Native</option><option>Light</option><option>Structured</option></select>
+    </div>
+    <div class="field">
+      <label>Current source</label>
+      <div class="title-preview" style="margin:0"><span id="templateSource">Built-in preset</span></div>
+    </div>
+  </div>
+  <div class="color-grid" id="themeColorControls">
+    <div class="field"><label>Primary / H2</label><div class="color-field"><input type="color" id="primaryColor"><input type="text" id="primaryHex" aria-label="Primary color hex"></div></div>
+    <div class="field"><label>Accent</label><div class="color-field"><input type="color" id="accentColor"><input type="text" id="accentHex" aria-label="Accent color hex"></div></div>
+    <div class="field"><label>H3 background</label><div class="color-field"><input type="color" id="h3Color"><input type="text" id="h3Hex" aria-label="H3 background hex"></div></div>
+    <div class="field"><label>H3 text</label><div class="color-field"><input type="color" id="h3TextColor"><input type="text" id="h3TextHex" aria-label="H3 text hex"></div></div>
+    <div class="field"><label>Callout background</label><div class="color-field"><input type="color" id="calloutBgColor"><input type="text" id="calloutBgHex" aria-label="Callout background hex"></div></div>
+    <div class="field"><label>Callout border</label><div class="color-field"><input type="color" id="calloutBorderColor"><input type="text" id="calloutBorderHex" aria-label="Callout border hex"></div></div>
+    <div class="field"><label>Card / surface</label><div class="color-field"><input type="color" id="cardBgColor"><input type="text" id="cardBgHex" aria-label="Card background hex"></div></div>
+    <div class="field"><label>Divider / quote</label><div class="color-field"><input type="color" id="dividerColor"><input type="text" id="dividerHex" aria-label="Divider color hex"></div></div>
+  </div>
+  <div class="access-box" id="themeAccessibilityControls">
+    <div class="access-head"><strong>Accessibility check</strong><span class="access-summary" id="accessSummary"></span></div>
+    <div class="contrast-list" id="contrastList"></div>
+    <div class="note">Text combinations are checked against WCAG contrast thresholds: 4.5:1 for normal text and 3:1 for large heading text. Borders and decorative accents are shown but are not treated as text.</div>
+  </div>
+  <div class="note hidden" id="nativeTemplateNote">Canvas Native uses Canvas's default appearance and does not save visual template settings.</div>
+  <div class="template-actions">
+    <div class="field" id="templateNameField"><label for="templateName">Custom template name</label><input id="templateName" type="text" placeholder="e.g., Literature — Forest"></div>
+    <button class="primary small-btn" id="saveTemplate" type="button">Save Template</button>
+    <button class="secondary small-btn" id="duplicateTemplate" type="button">Duplicate</button>
+    <button class="secondary small-btn" id="exportTemplate" type="button">Export</button>
+    <button class="secondary small-btn" id="importTemplate" type="button">Import</button>
+    <button class="secondary small-btn" id="loadDvcPresets" type="button">Add DVC Green Presets</button>
+    <input class="hidden" id="importTemplateFile" type="file" accept="application/json,.json">
+    <button class="secondary small-btn" id="resetTemplate" type="button">Reset to Preset</button>
+    <button class="danger small-btn" id="deleteTemplate" type="button" disabled>Remove Template</button>
+  </div>
+  <div class="note" id="templateStatus"></div>
+  <div class="note">Built-in presets cannot be removed; use <strong>Reset to Preset</strong> to return one to its original settings. DVC presets are optional and can be added again at any time. Imported or other custom templates that you remove must be re-imported or restored from a Course Studio backup if you want them back.</div>
+</div>
+
+    </div>
+  </section>
+  <section class="panel">
+    <div class="panel-head">Theme preview</div>
+    <div class="panel-body">
+      <div class="template-preview-note">This sample page shows how the selected template treats common Canvas components.</div>
+      <div id="templatePreview" class="template-preview-wrap"></div>
+    </div>
+  </section>
+</main>
+</div>
+
+<div id="snippetsMode" class="mode-view">
+<main class="template-app">
+  <section class="panel">
+    <div class="panel-head">Create or edit a reusable snippet</div>
+    <div class="panel-body">
+      <p class="intro">Snippets are reusable page-level additions. Top-of-page reminders appear before the main page body; bottom-of-page notes appear just before the footer. Choose a preset to adapt, or add your own. Built-in presets stay available; custom snippets are saved in this browser.</p>
+      <div class="two">
+        <div class="field">
+          <label for="snippetType">Snippet kind</label>
+          <select id="snippetType"><option value="qa">Top-of-page reminder</option><option value="transparency">Bottom-of-page note</option></select>
+        </div>
+        <div class="field">
+          <label for="snippetBase">Preset</label>
+          <select id="snippetBase"></select>
+        </div>
+      </div>
+      <div id="qaSnippetFields">
+        <div class="field"><label for="snippetHeading">Top-of-page reminder heading</label><input id="snippetHeading" type="text"></div>
+        <div class="field"><label for="snippetBody">Top-of-page reminder text</label><textarea id="snippetBody" style="min-height:130px"></textarea></div>
+      </div>
+      <div id="transparencySnippetFields" class="hidden">
+        <div class="field"><label for="snippetTransparencyText">Bottom-of-page note text</label><textarea id="snippetTransparencyText" style="min-height:150px"></textarea></div>
+      </div>
+      <div class="field"><label for="snippetName">Snippet name</label><input id="snippetName" type="text" placeholder="e.g., Weekly questions reminder or transparency note"></div>
+      <div class="actions">
+        <button class="primary" id="addSnippet" type="button">Add Snippet</button>
+        <button class="secondary" id="saveSnippet" type="button">Save Changes</button>
+        <button class="secondary" id="renameSnippet" type="button">Rename Snippet</button>
+        <button class="secondary" id="duplicateSnippet" type="button">Duplicate</button>
+        <button class="danger" id="deleteSnippet" type="button">Delete Custom</button>
+        <span class="status" id="snippetStatus"></span>
+      </div>
+    </div>
+  </section>
+  <section class="panel">
+    <div class="panel-head">Snippet preview</div>
+    <div class="panel-body">
+      <div class="title-preview"><strong>Preview uses the currently selected Build theme</strong><span>Snippet wording is separate from visual styling.</span></div>
+      <div id="snippetPreview" style="padding:12px;border:1px solid var(--border);border-radius:8px;background:#fff"></div>
+    </div>
+  </section>
+</main>
+</div>
+
+<div id="backupMode" class="mode-view">
+<main class="template-app">
+  <section class="panel">
+    <div class="panel-head">Back up Course Studio</div>
+    <div class="panel-body">
+      <p class="intro">Create one portable backup containing all custom templates and snippets plus your current Studio selections.</p>
+      <div class="title-preview">
+        <strong>What the backup includes</strong>
+        <span>Custom templates, custom snippets, selected theme, selected top-of-page reminder preset, selected bottom-of-page note preset, and common Build preferences.</span>
+      </div>
+      <div class="title-preview">
+        <strong>Where does the backup go?</strong>
+        <span>When you export a backup, your browser normally saves the JSON file to its usual Downloads folder unless you have configured the browser to ask where to save each file.</span>
+      </div>
+      <div class="title-preview">
+        <strong>Recommended backup workflow</strong>
+        <span><strong>1. Export</strong> your current Course Studio settings. <strong>2. Store</strong> the JSON file somewhere you already back up regularly, such as OneDrive, Dropbox, Google Drive, or an institutional network drive. <strong>3. Restore</strong> that file later if you need to recover your templates, snippets, or preferences.</span>
+      </div>
+      <div class="actions" style="margin-top:14px">
+        <button class="primary" id="exportStudioBackup" type="button">Export Full Backup</button>
+        <span class="status" id="backupStatus"></span>
+      </div>
+      <div class="note" style="margin-top:12px">Backup filenames include the export date, for example <strong>course_studio_backup_2026-11-16.json</strong>. Export a fresh copy after meaningful template or snippet changes you would not want to recreate.</div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">Restore Course Studio</div>
+    <div class="panel-body">
+      <p class="intro">Restore a full Course Studio backup on this browser or another computer. The file is validated before anything is changed.</p>
+      <input id="restoreStudioBackupFile" type="file" accept=".json,application/json" class="hidden">
+      <div class="actions">
+        <button class="secondary" id="restoreStudioBackup" type="button">Restore Full Backup</button>
+        <span class="status" id="restoreStatus"></span>
+      </div>
+      <div class="note" style="margin-top:12px">Restore replaces the current browser's custom templates and custom snippets with the contents of the backup. Built-in presets and built-in snippets are never modified.</div>
+    </div>
+  </section>
+</main>
+</div>
+
+<div id="aboutMode" class="mode-view">
+<main class="template-app">
+  <section class="panel">
+    <div class="panel-head">About Canvas Course Studio</div>
+    <div class="panel-body">
+      <p>Canvas Course Studio is an offline tool for creating consistent Canvas pages quickly. It uses simple markup to translate ordinary text into Canvas-ready HTML, from minimally styled Canvas-native structure to more advanced visual layouts.</p>
+      <p>Canvas Course Studio was developed with ChatGPT as a development tool, but the Studio itself does not connect to ChatGPT, Canvas, or any other online service. It works without an internet connection. User-created content, templates, snippets, preferences, and backups remain local unless the user chooses to copy, export, upload, or share them independently.</p>
+      <div class="title-preview" style="margin-top:16px">
+        <strong>© 2026 Alan Haslam</strong>
+        <span>Canvas Course Studio software is licensed under the MIT License. Documentation and sample content are licensed under Creative Commons Attribution 4.0 International (CC BY 4.0).</span>
+      </div>
+    </div>
+  </section>
+  <section class="panel">
+    <div class="panel-head">How to use this tool</div>
+    <div class="panel-body">
+      <ol>
+        <li><strong>Choose a theme.</strong> Use <strong>Canvas Native</strong> for minimally styled semantic HTML, or choose Light or Structured when you want more visual treatment. Turn on Advanced features only if you want richer layout options.</li>
+        <li><strong>Write or paste content.</strong> Use the Course Studio body and simple markup, or click <strong>Load Sample Page</strong> to see a working example.</li>
+        <li><strong>Add page-level extras.</strong> Use a top-of-page reminder or bottom-of-page note when you want reusable text outside the main page body.</li>
+        <li><strong>Preview and copy.</strong> Review the Canvas preview, then copy the generated HTML into Canvas.</li>
+        <li><strong>Customize when useful.</strong> The Templates and Snippets workspaces let you save reusable styles and wording. Export a full backup if you create anything you would hate to lose.</li>
+      </ol>
+      <p class="note">Canvas Course Studio does not publish directly to Canvas. You remain in control of what is copied, exported, or shared.</p>
+    </div>
+  </section>
+  <section class="panel">
+    <div class="panel-head">Tips / FAQ</div>
+    <div class="panel-body">
+      <h3 style="margin-top:0">Tips</h3>
+      <ul>
+        <li>Use <strong>Canvas Native</strong> when you want clean semantic HTML that stays close to Canvas defaults.</li>
+        <li>Start with <strong>Light</strong> when you want restrained visual styling without much additional structure.</li>
+        <li>Use <strong>Structured</strong> when sections benefit from stronger visual separation.</li>
+        <li>Turn on <strong>Advanced features</strong> only when you want richer layout options.</li>
+        <li>Preview in Canvas before publishing.</li>
+        <li>Keep headings semantic; don’t choose H3 or H4 just because you like how they look.</li>
+        <li>Use callouts sparingly so they still feel important.</li>
+        <li>Export a full backup after meaningful customization.</li>
+      </ul>
+
+
+      <h3 style="margin-top:24px">FAQ</h3>
+      <p><strong>“Back to Modules” looks like a link, but it won’t know your Canvas course automatically.</strong><br>Course Studio is offline, so you’ll need to replace the footer URL in Canvas with the correct course Modules link.</p>
+
+      <p><strong>Will my custom templates and snippets follow me to another computer/browser?</strong><br>Not automatically. Use <strong>Backup → Export Full Backup</strong>, then restore that file on the other browser/computer.</p>
+
+      <p><strong>What’s the difference between a callout and a top-of-page reminder?</strong><br>A callout is part of the page body and goes wherever you insert it. A <strong>Top-of-page reminder</strong> is a reusable page-level message that Course Studio places near the beginning of the page automatically. The default shows an example “get in touch with questions” reminder.</p>
+
+      <p><strong>What’s the difference between a bottom-of-page note and a callout?</strong><br>A <strong>Bottom-of-page note</strong> is reusable page-level language—transparency notes, attribution, recurring instructor notes, etc.—that appears near the footer. Callouts belong to the actual instructional content. The default shows an example of instructor transparency about AI use in developing course materials.</p>
+
+      <p><strong>Why are some features hidden until I enable Advanced features?</strong><br>The default interface is meant to stay simple. Advanced mode exposes richer layouts, additional components, and more complex template options when you want them. These templates use more layered HTML, which can break or behave unexpectedly as you manipulate it, and they create a more complicated visual look that may not be every instructor’s preference for their students.</p>
+
+      <p><strong>Can I break anything in Canvas with the HTML?</strong><br>Usually the worst outcome is that something doesn’t look quite right. Paste into Canvas, preview it there, and adjust as needed. Use the <strong>Course Link</strong> tool in the Rich Content Editor to add links to other pages in the course. Course Studio doesn’t change your Canvas course directly.</p>
+
+      <p><strong>Can I import an existing Canvas page?</strong><br>Yes, using <strong>Import Canvas HTML</strong> on the <strong>Build</strong> tab. It works best with HTML that already resembles Course Studio’s structure; unusual Canvas formatting may not round-trip perfectly.</p>
+
+      <p><strong>Should I use H2, H3, and H4 in order?</strong><br>Always—this is a cornerstone of accessible page design. Think of them as Section → Subsection → Minor Heading. That keeps the page structure clear and accessible.</p>
+
+      <p><strong>What happens if I import a custom template or DVC preset?</strong><br>It is saved locally in that browser. It does not alter the built-in presets.</p>
+
+      <p><strong>Where should I keep my Course Studio backup file?</strong><br>Somewhere you already back up regularly. Export a fresh one after making custom templates or snippets you would not want to recreate.</p>
+    </div>
+  </section>
+</main>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+
+const DEFAULT_THEME='lightTeal';
+const BASE_THEME_KEYS=['canvasNative','lightTeal','lightGraphite','structuredTeal','structuredGraphite'];
+const ADVANCED_THEME_KEYS=['advancedTeal','advancedGraphite'];
+const ADVANCED_THEME_FALLBACK={advancedTeal:'structuredTeal',advancedGraphite:'structuredGraphite'};
+
+const BUILTIN_THEMES={
+  canvasNative:{
+    name:'Canvas Native', complexity:'Native',
+    note:'Minimal semantic HTML that stays close to Canvas default presentation, with no custom heading bars, containers, or theme colors.',
+    primary:'#333333', accent:'#666666', h3:'#FFFFFF', h3Text:'#333333',
+    calloutBg:'#FFFFFF', calloutBorder:'#666666', cardBg:'#FFFFFF', quoteBorder:'#666666', divider:'#666666'
+  },
+  lightTeal:{
+    name:'Light — Teal', complexity:'Light',
+    note:'Simple charcoal hierarchy with a restrained teal accent and minimal containment.',
+    primary:'#515151', accent:'#3F8F8C', h3:'#BEBEBE', h3Text:'#222222',
+    calloutBg:'#FFFFFF', calloutBorder:'#3F8F8C', cardBg:'#F5F5F5', quoteBorder:'#515151', divider:'#515151'
+  },
+  lightGraphite:{
+    name:'Light — Graphite + Blue', complexity:'Light',
+    note:'Restrained grayscale structure with one deep-blue visual anchor.',
+    primary:'#515151', accent:'#194973', h3:'#BEBEBE', h3Text:'#222222',
+    calloutBg:'#F2F2F2', calloutBorder:'#194973', cardBg:'#F5F5F5', quoteBorder:'#515151', divider:'#515151'
+  },
+  structuredTeal:{
+    name:'Structured — Teal', complexity:'Structured',
+    note:'A slightly more guided teal version with outlined section containers and lightly tinted callouts.',
+    primary:'#515151', accent:'#3F8F8C', h3:'#DCE8E7', h3Text:'#1F3F3D',
+    calloutBg:'#F1F8F7', calloutBorder:'#3F8F8C', cardBg:'#F5F5F5', quoteBorder:'#515151', divider:'#515151'
+  },
+  structuredGraphite:{
+    name:'Structured — Graphite + Blue', complexity:'Structured',
+    note:'Graphite-led structure with blue support for section containers and callouts.',
+    primary:'#515151', accent:'#194973', h3:'#E4EBF2', h3Text:'#243746',
+    calloutBg:'#F4F8FB', calloutBorder:'#194973', cardBg:'#F5F5F5', quoteBorder:'#515151', divider:'#515151'
+  },
+  advancedTeal:{
+    name:'Advanced — Teal', complexity:'Rich',
+    note:'A fuller teal example with layered section cards for users who want a richer page treatment.',
+    primary:'#3A4A57', accent:'#2F7F7A', h3:'#DCE8E7', h3Text:'#1F3F3D',
+    calloutBg:'#F1F8F7', calloutBorder:'#2F7F7A', cardBg:'#F5F5F5', quoteBorder:'#3A4A57', divider:'#3A4A57'
+  },
+  advancedGraphite:{
+    name:'Advanced — Graphite + Blue', complexity:'Rich',
+    note:'A fuller graphite-and-blue example with richer section cards and stronger surface treatment.',
+    primary:'#3A4A57', accent:'#194973', h3:'#E1E8F0', h3Text:'#243746',
+    calloutBg:'#F4F8FB', calloutBorder:'#194973', cardBg:'#F5F5F5', quoteBorder:'#3A4A57', divider:'#3A4A57'
+  }
+};
+
+const OPTIONAL_DVC_THEMES={
+  dvcOptionalLight:{
+    name:'DVC Green — Light', complexity:'Light',
+    note:'Optional DVC-green light treatment with minimal containment.',
+    primary:'#017550', accent:'#017550', h3:'#E8F3E5', h3Text:'#24432D',
+    calloutBg:'#FFFFFF', calloutBorder:'#017550', cardBg:'#F5F7F5', quoteBorder:'#017550', divider:'#017550'
+  },
+  dvcOptionalStructured:{
+    name:'DVC Green — Structured', complexity:'Structured',
+    note:'Optional DVC-green structured treatment with DVC blue as a supporting accent.',
+    primary:'#017550', accent:'#173F6C', h3:'#DCEBD8', h3Text:'#24352B',
+    calloutBg:'#F3F7FA', calloutBorder:'#173F6C', cardBg:'#F3F7F4', quoteBorder:'#017550', divider:'#017550'
+  },
+  dvcOptionalAdvanced:{
+    name:'DVC Green — Advanced', complexity:'Rich',
+    note:'Optional richer DVC treatment with green leading, blue secondary, and neutral surfaces.',
+    primary:'#017550', accent:'#173F6C', h3:'#EEF6F0', h3Text:'#2E5D3A',
+    calloutBg:'#F7FAF8', calloutBorder:'#017550', cardBg:'#F5F5F5', quoteBorder:'#017550', divider:'#017550'
+  }
+};
+
+let themes={...BUILTIN_THEMES};
+let workingTheme=null;
+let baseThemeKey='lightTeal';
+const CUSTOM_STORAGE_KEY='courseStudioReleaseCustomThemes_v098';
+const LEGACY_CUSTOM_STORAGE_KEY='courseStudioReleaseCustomThemes_v090';
+const DVC_PACK_ENABLED_KEY='courseStudioReleaseDvcPackEnabled_v096';
+
+function cloneTheme(t){return JSON.parse(JSON.stringify(t));}
+function isLegacyAlanHouseStyle(t){
+  return String(t?.name||'').trim().toLowerCase()==='alan house style';
+}
+function loadCustomThemes(){
+  try{
+    let raw=localStorage.getItem(CUSTOM_STORAGE_KEY);
+    let saved={};
+    if(raw){
+      saved=JSON.parse(raw||'{}');
+    }else{
+      // One-time migration from the earlier release namespace. Preserve ordinary
+      // custom templates, but deliberately leave Alan House Style out of the
+      // shareable release state. It can still be imported or restored explicitly.
+      const legacy=JSON.parse(localStorage.getItem(LEGACY_CUSTOM_STORAGE_KEY)||'{}');
+      Object.entries(legacy).forEach(([key,t])=>{
+        if(!isLegacyAlanHouseStyle(t))saved[key]=t;
+      });
+      localStorage.setItem(CUSTOM_STORAGE_KEY,JSON.stringify(saved));
+    }
+    const dvcPackEnabled=localStorage.getItem(DVC_PACK_ENABLED_KEY)==='true';
+    let cleaned=false;
+    Object.entries(saved).forEach(([key,t])=>{
+      const isOptionalDvc=Object.prototype.hasOwnProperty.call(OPTIONAL_DVC_THEMES,key);
+      if(isOptionalDvc&&!dvcPackEnabled){cleaned=true;return;}
+      themes[key]={...t,custom:true};
+    });
+    if(cleaned){
+      const filtered={};
+      Object.entries(saved).forEach(([key,t])=>{
+        if(!Object.prototype.hasOwnProperty.call(OPTIONAL_DVC_THEMES,key))filtered[key]=t;
+      });
+      localStorage.setItem(CUSTOM_STORAGE_KEY,JSON.stringify(filtered));
+    }
+  }catch(e){}
+}
+function saveCustomThemes(){
+  const custom={};
+  Object.entries(themes).forEach(([key,t])=>{if(t.custom)custom[key]=t;});
+  try{localStorage.setItem(CUSTOM_STORAGE_KEY,JSON.stringify(custom));}catch(e){}
+}
+function advancedEnabled(){return !!($('advancedMode')?.checked||$('advancedTemplatesToggle')?.checked);}
+function visibleBuiltInThemeKeys(){return advancedEnabled()?[...BASE_THEME_KEYS,...ADVANCED_THEME_KEYS]:[...BASE_THEME_KEYS];}
+function isAdvancedThemeKey(key){return ADVANCED_THEME_KEYS.includes(key);}
+function normalizeThemeSelection(selected){
+  if(selected&&themes[selected]&&themes[selected].custom)return selected;
+  const visible=visibleBuiltInThemeKeys();
+  if(selected&&visible.includes(selected))return selected;
+  if(selected&&ADVANCED_THEME_FALLBACK[selected]&&visible.includes(ADVANCED_THEME_FALLBACK[selected]))return ADVANCED_THEME_FALLBACK[selected];
+  return DEFAULT_THEME;
+}
+function populateThemeSelect(sel,selected){
+  if(!sel)return;
+  sel.innerHTML='';
+  visibleBuiltInThemeKeys().forEach(key=>{
+    const t=themes[key]||BUILTIN_THEMES[key];
+    const o=document.createElement('option');o.value=key;o.textContent=t.name;sel.appendChild(o);
+  });
+  const customEntries=Object.entries(themes).filter(([,t])=>t.custom);
+  if(customEntries.length){
+    const group=document.createElement('optgroup');group.label='Custom templates';
+    customEntries.forEach(([key,t])=>{const o=document.createElement('option');o.value=key;o.textContent=t.name;group.appendChild(o);});
+    sel.appendChild(group);
+  }
+  sel.value=normalizeThemeSelection(selected);
+}
+function rebuildThemeOptions(selected){
+  const normalized=normalizeThemeSelection(selected||$('theme')?.value||$('templateTheme')?.value||DEFAULT_THEME);
+  populateThemeSelect($('theme'),normalized);
+  populateThemeSelect($('templateTheme'),normalized);
+}
+function refreshComplexityOptions(){
+  const sel=$('complexity');
+  if(!sel)return;
+  const current=sel.value||'Light';
+  const options=advancedEnabled()?['Native','Light','Structured','Rich']:['Native','Light','Structured'];
+  sel.innerHTML=options.map(v=>`<option>${v}</option>`).join('');
+  sel.value=options.includes(current)?current:(current==='Rich'?'Structured':'Light');
+}
+function updateContentHelp(){
+  const advanced=advancedEnabled();
+  $('content').placeholder=advanced
+    ? 'Use ## for H2 sections, ### for H3 subsections, #### for H4 minor headings, [card]...[/card] for an optional advanced card, [callout]...[/callout] for a multi-paragraph callout, [quote]...[/quote] for quoted/creative text, > for a quick callout, - for bullets, 1. for numbered lists, [top] for Back to top links, and -- for an em dash.'
+    : 'Use ## for H2 sections, ### for H3 subsections, #### for H4 minor headings, > for a quick callout, - for bullets, 1. for numbered lists, [top] for Back to top links, and -- for an em dash.';
+  $('contentSyntaxNote').textContent=advanced
+    ? '`##` = H2 section · `###` = H3 subsection · `####` = H4 minor heading · `[card]...[/card]` = optional advanced card · `[callout]...[/callout]` = multi-paragraph callout · `[quote]...[/quote]` = quote/creative-text block · `>` = quick callout · `-` = bullets · `1.` = numbered list · `[top]` = Back to top · `--` = em dash · `**bold**` = bold · `*italic*` = italics'
+    : '`##` = H2 section · `###` = H3 subsection · `####` = H4 minor heading · `>` = quick callout · `-` = bullets · `1.` = numbered list · `[top]` = Back to top · `--` = em dash · `**bold**` = bold · `*italic*` = italics';
+}
+function setAdvancedMode(enabled){
+  if($('advancedMode'))$('advancedMode').checked=enabled;
+  if($('advancedTemplatesToggle'))$('advancedTemplatesToggle').checked=enabled;
+  document.querySelectorAll('.advanced-only').forEach(el=>el.classList.toggle('hidden',!enabled));
+  if($('advancedBuildNote'))$('advancedBuildNote').textContent=enabled
+    ? 'Advanced features are on. Rich example presets, quote blocks, and additional layout controls are available.'
+    : 'Advanced features are off. Rich example presets, quote blocks, and advanced layout controls stay hidden until you turn them on.';
+  refreshComplexityOptions();
+  updateContentHelp();
+  const selected=normalizeThemeSelection($('theme')?.value||$('templateTheme')?.value||DEFAULT_THEME);
+  rebuildThemeOptions(selected);
+  selectTheme(selected);
+}
+
+function currentTheme(){return workingTheme||themes[$('theme').value]||themes[DEFAULT_THEME];}
+function themeStyle(kind){
+  const t=currentTheme();
+  if(t.complexity==='Native') return '';
+  if(kind==='h3') return `background: ${t.h3}; padding: 6px 15px; color: ${t.h3Text}; margin-top: 16px;`;
+  if(kind==='callout') return `background: ${t.calloutBg}; border-left: 5px solid ${t.calloutBorder}; padding: 8px 15px; margin: 14px 0px;`;
+  if(kind==='card') return `background: ${t.cardBg}; margin-top: 12px; padding: 12px;${t.complexity==='Rich'?' border-radius: 10px;':''}${t.complexity==='Structured'?` border: 1px solid ${t.h3};`:''}`;
+  if(kind==='quote') return `background: #ffffff; border-left: 4px solid ${t.quoteBorder}; margin: 10px 0px; padding: 12px 15px;`;
+  return '';
+}
+
+const BUILTIN_SNIPPETS={
+  qaDefault:{name:'Default reminder',type:'qa',heading:'Questions about the week?',body:'Use the class Q&A space for questions that may help everyone. For individual matters, send me a Canvas Inbox message.',builtIn:true},
+  transparencyDefault:{name:'Default note',type:'transparency',text:'Instructor transparency: AI tools may assist with drafting, formatting, or course-development workflow; final course materials are reviewed and revised by the instructor.',builtIn:true}
+};
+let snippetLibrary={...BUILTIN_SNIPPETS};
+const SNIPPET_STORAGE_KEY='canvasCourseStudioReleaseCustomSnippets_v090';
+const PREF_STORAGE_KEY='canvasCourseStudioReleasePreferences_v090';
+const STUDIO_BACKUP_FORMAT='canvas-course-studio-full-backup';
+const STUDIO_BACKUP_VERSION=1;
+function currentSnippet(key){return snippetLibrary[key]||BUILTIN_SNIPPETS[key];}
+function renderQaSnippet(sn){const t=currentTheme();if(t.complexity==='Native')return `<p><strong>${inlineMarkup(sn.heading||'')}</strong>${sn.body?' '+inlineMarkup(sn.body):''}</p>`;return `<div style="${themeStyle('callout')}"><p style="margin: 0px;"><strong>${inlineMarkup(sn.heading||'')}</strong>${sn.body?' '+inlineMarkup(sn.body):''}</p></div>`;}
+function renderTransparencySnippet(sn){const t=currentTheme();return t.complexity==='Native'?`<p><em>${inlineMarkup(sn.text||'')}</em></p>`:`<p style="font-size: 0.9em; color: #555555;"><em>${inlineMarkup(sn.text||'')}</em></p>`;}
+function selectedQaSnippet(){return currentSnippet($('qaSnippetSelect').value)||BUILTIN_SNIPPETS.qaDefault;}
+function selectedTransparencySnippet(){return currentSnippet($('transparencySnippetSelect').value)||BUILTIN_SNIPPETS.transparencyDefault;}
+function updateSnippetPickers(){
+  if($('qaSnippetPicker'))$('qaSnippetPicker').classList.toggle('hidden',!$('qa').checked);
+  if($('transparencySnippetPicker'))$('transparencySnippetPicker').classList.toggle('hidden',!$('transparency').checked);
+}
+
+function escapeHtml(str){
+  return str.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+}
+
+function inlineMarkup(str){
+  let s=escapeHtml(str);
+  s=s.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  s=s.replace(/\*(.+?)\*/g,'<em>$1</em>');
+  s=s.replace(/--/g,'&mdash;');
+  return s;
+}
+
+function parseBlocks(text){
+  const lines=text.replace(/\r/g,'').split('\n'),blocks=[];
+  let para=[],list=null,i=0;
+  const flushPara=()=>{if(para.length){blocks.push({type:'p',text:para.join(' ').trim()});para=[];}};
+  const flushList=()=>{if(list){blocks.push(list);list=null;}};
+  while(i<lines.length){
+    const line=lines[i].trim();
+    if(!line){flushPara();flushList();i++;continue;}
+    if(line==='[card]'){
+      flushPara();flushList();i++;const innerLines=[];
+      while(i<lines.length && lines[i].trim()!=='[/card]'){innerLines.push(lines[i]);i++;}
+      blocks.push({type:'card',blocks:parseBlocks(innerLines.join('\n'))});
+      if(i<lines.length && lines[i].trim()==='[/card]')i++;continue;
+    }
+    if(line==='[callout]'){
+      flushPara();flushList();i++;const innerLines=[];
+      while(i<lines.length && lines[i].trim()!=='[/callout]'){innerLines.push(lines[i]);i++;}
+      blocks.push({type:'calloutBlock',blocks:parseBlocks(innerLines.join('\n'))});
+      if(i<lines.length && lines[i].trim()==='[/callout]')i++;continue;
+    }
+    if(line==='[quote]'){
+      flushPara();flushList();i++;const innerLines=[];
+      while(i<lines.length && lines[i].trim()!=='[/quote]'){innerLines.push(lines[i]);i++;}
+      blocks.push({type:'quote',blocks:parseBlocks(innerLines.join('\n'))});
+      if(i<lines.length && lines[i].trim()==='[/quote]')i++;continue;
+    }
+    if(line==='[top]'){flushPara();flushList();blocks.push({type:'top'});i++;continue;}
+    if(line.startsWith('#### ')){flushPara();flushList();blocks.push({type:'h4',text:line.slice(5).trim()});i++;continue;}
+    if(line.startsWith('### ')){flushPara();flushList();blocks.push({type:'h3',text:line.slice(4).trim()});i++;continue;}
+    if(line.startsWith('## ')){flushPara();flushList();blocks.push({type:'h2',text:line.slice(3).trim()});i++;continue;}
+    if(line.startsWith('> ')){flushPara();flushList();blocks.push({type:'callout',text:line.slice(2).trim()});i++;continue;}
+    const bullet=line.match(/^-\s+(.+)$/);
+    if(bullet){flushPara();if(!list||list.type!=='ul'){flushList();list={type:'ul',items:[]};}list.items.push(bullet[1]);i++;continue;}
+    const num=line.match(/^\d+\.\s+(.+)$/);
+    if(num){flushPara();if(!list||list.type!=='ol'){flushList();list={type:'ol',items:[]};}list.items.push(num[1]);i++;continue;}
+    flushList();para.push(line);i++;
+  }
+  flushPara();flushList();return blocks;
+}
+function renderBlock(b){
+  const t=currentTheme();
+  if(b.type==='h4')return `<h4>${inlineMarkup(b.text)}</h4>`;
+  if(b.type==='h3')return t.complexity==='Native'?`<h3>${inlineMarkup(b.text)}</h3>`:`<h3 style="${themeStyle('h3')}">${inlineMarkup(b.text)}</h3>`;
+  if(b.type==='callout')return t.complexity==='Native'?`<blockquote><p>${inlineMarkup(b.text)}</p></blockquote>`:`<div style="${themeStyle('callout')}"><p style="margin: 0px;">${inlineMarkup(b.text)}</p></div>`;
+  if(b.type==='calloutBlock')return t.complexity==='Native'?`<blockquote>${renderBody(b.blocks,false)}</blockquote>`:`<div style="${themeStyle('callout')}">${renderBody(b.blocks,false)}</div>`;
+  if(b.type==='ul')return `<ul>\n${b.items.map(x=>`<li>${inlineMarkup(x)}</li>`).join('\n')}\n</ul>`;
+  if(b.type==='ol')return `<ol>\n${b.items.map(x=>`<li>${inlineMarkup(x)}</li>`).join('\n')}\n</ol>`;
+  if(b.type==='top')return `<p style="text-align: right;"><a href="#top">&uarr; Back to top</a></p>`;
+  if(b.type==='card')return t.complexity==='Native'?`<div>${renderBody(b.blocks,false)}</div>`:`<div style="${themeStyle('card')}">${renderBody(b.blocks,false)}</div>`;
+  if(b.type==='quote')return t.complexity==='Native'?`<blockquote>${renderBody(b.blocks,false)}</blockquote>`:`<blockquote style="${themeStyle('quote')}">${renderBody(b.blocks,false)}</blockquote>`;
+  if(b.type==='p')return `<p>${inlineMarkup(b.text)}</p>`;
+  return '';
+}
+
+function renderBody(blocks,useContainers){
+  const t=currentTheme();
+  let out='',open=false;
+  const close=()=>{if(open){out+='</div>\n</div>\n';open=false;}};
+
+  for(const b of blocks){
+    if(b.type==='h2'){
+      close();
+      if(t.complexity==='Rich' && useContainers){
+        out+=`<div style="background: ${t.cardBg}; margin-top: 12px; overflow: hidden; border-radius: 10px; border: 1px solid #dddddd;"><h2 style="background: ${t.primary}; padding: 8px 15px; color: #ffffff; margin: 0px; border-left: 20px solid ${t.accent};">${inlineMarkup(b.text)}</h2><div style="padding: 12px;">`;
+        open=true;
+      }else if(t.complexity==='Structured' && useContainers){
+        out+=`<div style="margin-top: 14px; border: 1px solid ${t.accent}; border-radius: 8px; overflow: hidden;"><h2 style="background: ${t.primary}; border-left: 10px solid ${t.accent}; padding: 7px 15px; color: #ffffff; margin: 0px;">${inlineMarkup(b.text)}</h2><div style="padding: 12px 14px;">`;
+        open=true;
+      }else if(t.complexity==='Native'){
+        out+=`<h2>${inlineMarkup(b.text)}</h2>\n`;
+      }else{
+        out+=`<h2 style="background: ${t.primary}; border-left: 5px solid ${t.accent}; padding: 7px 15px; color: #ffffff; margin-top: 18px;">${inlineMarkup(b.text)}</h2>\n`;
+      }
+    }else out+=renderBlock(b)+'\n';
+  }
+  close();return out;
+}
+
+function footerHtml(){
+  if(!$('includeFooter').checked)return '';
+  const mode=$('footerMode').value;
+  if(mode==='none')return '';
+  const t=currentTheme();
+  const label=$('modulesLabel').value.trim()||'← Back to Modules';
+  const url=escapeHtml($('modulesUrl').value.trim()||'/courses');
+  const parts=[];
+  if(mode==='topmodules')parts.push('<a href="#top">&uarr; Back to top</a>');
+  parts.push(`<a href="${url}">${inlineMarkup(label)}</a>`);
+  return t.complexity==='Native'?`<hr />\n<p style="text-align: right;">${parts.join(' | ')}</p>\n`:`<hr style="border: 0; border-top: 3px solid ${t.divider}; margin: 24px 0 12px;" />\n<p style="text-align: right;">${parts.join(' | ')}</p>\n`;
+}
+
+function makeHtml(){
+  const blocks=parseBlocks($('content').value);let inner='';
+  const needTopAnchor=blocks.some(b=>b.type==='top') || ($('includeFooter').checked && $('footerMode').value==='topmodules');
+  if(needTopAnchor)inner+='<p><a id="top"></a></p>\n';
+  if($('qa').checked)inner+=renderQaSnippet(selectedQaSnippet())+'\n';
+  inner+=renderBody(blocks,$('cards').checked);
+  if($('transparency').checked)inner+=renderTransparencySnippet(selectedTransparencySnippet())+'\n';
+  inner+=footerHtml();
+  return `<div style="max-width: 100%;">\n${inner}</div>`;
+}
+
+let previewDirty=false;
+let syncing=false;
+
+function generate(){
+  const html=makeHtml();
+  $('htmlOutput').value=html;
+  if(!previewDirty)$('preview').innerHTML=html;
+  $('titlePreview').textContent=$('title').value.trim()||'(untitled)';
+  $('status').textContent=previewDirty?'Source updated; preview edit still unapplied':'Updated';
+  setTimeout(()=>$('status').textContent='',1200);
+}
+
+function htmlInlineToMarkup(el){
+  let out='';
+  el.childNodes.forEach(node=>{
+    if(node.nodeType===Node.TEXT_NODE){
+      out+=node.textContent.replace(/—/g,'--');
+    }else if(node.nodeType===Node.ELEMENT_NODE){
+      const tag=node.tagName.toLowerCase(),inner=htmlInlineToMarkup(node);
+      if(tag==='strong'||tag==='b')out+=`**${inner}**`;
+      else if(tag==='em'||tag==='i')out+=`*${inner}*`;
+      else if(tag==='br')out+='\n';
+      else out+=inner;
+    }
+  });
+  return out.replace(/\s+/g,' ').trim();
+}
+
+function convertCanvasHtml(html){
+  const doc=new DOMParser().parseFromString(html,'text/html'),lines=[];
+
+  function green(el){
+    const s=(el.getAttribute('style')||'').toLowerCase();
+    return el.tagName==='DIV'&&(s.includes('#f1f8f7')||s.includes('rgb(241, 248, 247)'))&&s.includes('border-left');
+  }
+
+  function topLink(el){
+    const t=(el.textContent||'').trim().toLowerCase();return (t==='back to top'||t==='↑ back to top')&&el.querySelector('a[href="#top"]');
+  }
+
+  function walk(el){
+    if(el.nodeType!==Node.ELEMENT_NODE)return;
+    const tag=el.tagName.toLowerCase();
+
+    const style=(el.getAttribute('style')||'').toLowerCase();
+    const isGrayCard=tag==='div' &&
+      (style.includes('#f5f5f5')||style.includes('rgb(245, 245, 245)')) &&
+      style.includes('border-radius') &&
+      !el.querySelector(':scope > h2');
+
+    if(isGrayCard){
+      lines.push('[card]','');
+      [...el.children].forEach(child=>walk(child));
+      lines.push('[/card]','');
+      return;
+    }
+
+    if(tag==='blockquote'){
+      lines.push('[quote]','');
+      [...el.children].forEach(child=>walk(child));
+      lines.push('[/quote]','');
+      return;
+    }
+
+    if(tag==='h2'){lines.push(`## ${htmlInlineToMarkup(el)}`,'');return;}
+    if(tag==='h3'){lines.push(`### ${htmlInlineToMarkup(el)}`,'');return;}
+    if(tag==='h4'){lines.push(`#### ${htmlInlineToMarkup(el)}`,'');return;}
+
+    if(tag==='p'){
+      if(topLink(el)){lines.push('[top]','');return;}
+      if(el.querySelector('a#top')&&!el.textContent.trim())return;
+      const txt=htmlInlineToMarkup(el);
+      if(txt && !txt.toLowerCase().includes('back to modules'))lines.push(txt,'');
+      return;
+    }
+
+    if(tag==='ul'){[...el.children].forEach(li=>lines.push(`- ${htmlInlineToMarkup(li)}`));lines.push('');return;}
+    if(tag==='ol'){[...el.children].forEach((li,i)=>lines.push(`${i+1}. ${htmlInlineToMarkup(li)}`));lines.push('');return;}
+
+    if(green(el)){
+      const ps=[...el.children].filter(child=>child.tagName&&child.tagName.toLowerCase()==='p');
+      const hasStructured=[...el.children].some(child=>child.tagName&&['ul','ol','h3','blockquote','div'].includes(child.tagName.toLowerCase()));
+      if(ps.length>1 || hasStructured){
+        lines.push('[callout]','');
+        [...el.children].forEach(child=>walk(child));
+        lines.push('[/callout]','');
+      }else{
+        const p=ps[0]||el;
+        const txt=htmlInlineToMarkup(p);
+        if(txt)lines.push(`> ${txt}`,'');
+      }
+      return;
+    }
+
+    if(tag==='hr')return;
+    [...el.children].forEach(walk);
+  }
+
+  [...doc.body.children].forEach(walk);
+  return lines.join('\n').replace(/\n{3,}/g,'\n\n').trim();
+}
+
+function insertAtCursor(text,cursorOffset=null){
+  const ta=$('content');
+  const previewWrap=$('previewWrap');
+  const s=ta.selectionStart??ta.value.length,e=ta.selectionEnd??ta.value.length;
+  const before=ta.value.slice(0,s),after=ta.value.slice(e);
+  const prefix=before&&!before.endsWith('\n')?'\n':'';
+  const suffix=after&&!after.startsWith('\n')?'\n':'';
+  const inserted=prefix+text+suffix;
+
+  // Preserve the user's working position in both panes while insertion
+  // and preview regeneration occur.
+  const editorScrollTop=ta.scrollTop;
+  const previewScrollTop=previewWrap.scrollTop;
+  const priorSyncing=syncing;
+  syncing=true;
+
+  ta.value=before+inserted+after;
+
+  let pos;
+  if(cursorOffset===null){
+    pos=(before+inserted).length;
+  }else{
+    pos=(before+prefix).length+cursorOffset;
+  }
+
+  try{
+    ta.focus({preventScroll:true});
+  }catch(e){
+    ta.focus();
+  }
+  ta.setSelectionRange(pos,pos);
+
+  previewDirty=false;
+  $('previewDirty').classList.add('hidden');
+  generate();
+
+  // innerHTML regeneration and focus can change scroll positions. Restore
+  // them after layout, while synced-scrolling remains temporarily suppressed.
+  requestAnimationFrame(()=>{
+    ta.scrollTop=Math.min(editorScrollTop,Math.max(0,ta.scrollHeight-ta.clientHeight));
+    previewWrap.scrollTop=Math.min(previewScrollTop,Math.max(0,previewWrap.scrollHeight-previewWrap.clientHeight));
+
+    try{
+      ta.focus({preventScroll:true});
+    }catch(e){
+      ta.focus();
+    }
+    ta.setSelectionRange(pos,pos);
+
+    requestAnimationFrame(()=>{
+      syncing=priorSyncing;
+    });
+  });
+}
+function proportionalScroll(from,to){
+  if(syncing || !$('syncScroll').checked)return;
+  const fromMax=from.scrollHeight-from.clientHeight;
+  const toMax=to.scrollHeight-to.clientHeight;
+  if(fromMax<=0||toMax<=0)return;
+  syncing=true;
+  to.scrollTop=(from.scrollTop/fromMax)*toMax;
+  requestAnimationFrame(()=>{syncing=false;});
+}
+
+$('content').addEventListener('scroll',()=>proportionalScroll($('content'),$('previewWrap')));
+$('previewWrap').addEventListener('scroll',()=>proportionalScroll($('previewWrap'),$('content')));
+
+$('preview').addEventListener('input',()=>{
+  previewDirty=true;
+  $('previewDirty').classList.remove('hidden');
+});
+
+$('applyPreview').addEventListener('click',()=>{
+  $('content').value=convertCanvasHtml($('preview').innerHTML);
+  previewDirty=false;
+  $('previewDirty').classList.add('hidden');
+  generate();
+  $('status').textContent='Preview changes applied';
+  setTimeout(()=>$('status').textContent='',1200);
+});
+
+
+$('loadSamplePage').addEventListener('click',()=>{
+  if($('content').value.trim() && !confirm('Replace the current Course Studio body with the sample page?'))return;
+  $('title').value='Sample Weekly Overview';
+  $('content').value=`## Welcome
+
+This sample page shows a few common Course Studio elements. Replace this wording with your own course content.
+
+> **This week:** Focus on the main reading, activity, or assignment for the module.
+
+## What to Do
+
+### Read and Review
+
+Use a short subsection when one major section contains more than one kind of work.
+
+- Read the assigned material.
+- Review the supporting page or resource.
+- Make note of questions you want to bring to class or the discussion.
+
+### Complete the Activity
+
+Give students a clear sequence and enough context to understand what they are doing and why.
+
+#### Before You Submit
+
+Use a minor heading sparingly when a subsection genuinely needs one more level of organization.
+
+## What to Submit
+
+1. Complete the required activity.
+2. Review the submission instructions.
+3. Submit your work in Canvas.
+
+## Looking Ahead
+
+End with a brief transition when it helps students see what comes next.`;
+  previewDirty=false;$('previewDirty').classList.add('hidden');generate();savePreferences();
+  $('status').textContent='Sample page loaded';setTimeout(()=>$('status').textContent='',1400);
+});
+
+$('insertSection').addEventListener('click',()=>{
+  const text='## Section heading\n\n';
+  insertAtCursor(text,3);
+});
+$('insertH3').addEventListener('click',()=>{
+  const text='### Subsection\n\n';
+  insertAtCursor(text,4);
+});
+$('insertH4').addEventListener('click',()=>{
+  const text='#### Minor heading\n\n';
+  insertAtCursor(text,5);
+});
+$('insertCallout').addEventListener('click',()=>{
+  const text='> Callout text\n';
+  insertAtCursor(text,2);
+});
+$('insertMultiCallout').addEventListener('click',()=>{
+  const text='[callout]\n\nFirst paragraph.\n\nSecond paragraph.\n\n[/callout]\n';
+  insertAtCursor(text,11);
+});
+$('insertQuote').addEventListener('click',()=>{
+  const text='[quote]\n\n\n[/quote]\n';
+  insertAtCursor(text,9);
+});
+$('insertBullets').addEventListener('click',()=>{
+  const text='- Item one\n- Item two\n';
+  insertAtCursor(text,2);
+});
+$('insertTop').addEventListener('click',()=>insertAtCursor('[top]\n'));
+
+const COLOR_FIELDS=[
+  ['primary','primaryColor','primaryHex'],['accent','accentColor','accentHex'],['h3','h3Color','h3Hex'],['h3Text','h3TextColor','h3TextHex'],
+  ['calloutBg','calloutBgColor','calloutBgHex'],['calloutBorder','calloutBorderColor','calloutBorderHex'],['cardBg','cardBgColor','cardBgHex'],['divider','dividerColor','dividerHex']
+];
+function validHex(v){return /^#[0-9a-fA-F]{6}$/.test(v.trim());}
+function normalizeHex(v){v=v.trim();if(!v.startsWith('#'))v='#'+v;return validHex(v)?v.toUpperCase():null;}
+function hexToRgb(hex){const h=hex.replace('#','');return [0,2,4].map(i=>parseInt(h.slice(i,i+2),16)/255);}
+function relLum(hex){return hexToRgb(hex).map(c=>c<=.03928?c/12.92:Math.pow((c+.055)/1.055,2.4)).reduce((s,c,i)=>s+c*[.2126,.7152,.0722][i],0);}
+function contrastRatio(a,b){const x=relLum(a),y=relLum(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05);}
+function contrastRow(label,fg,bg,threshold){
+  const ratio=contrastRatio(fg,bg),ok=ratio>=threshold;
+  return `<div class="contrast-row"><span>${label}</span><span class="swatches"><i class="swatch" style="background:${fg}"></i><i class="swatch" style="background:${bg}"></i>${ratio.toFixed(2)}:1</span><span class="${ok?'pass':'fail'}">${ok?'Pass':'Fail'}</span></div>`;
+}
+function updateAccessibility(){
+  const t=currentTheme(),rows=[];
+  rows.push({html:contrastRow('H2 white text / primary', '#FFFFFF', t.primary,3),ok:contrastRatio('#FFFFFF',t.primary)>=3});
+  rows.push({html:contrastRow('H3 text / H3 background', t.h3Text,t.h3,4.5),ok:contrastRatio(t.h3Text,t.h3)>=4.5});
+  rows.push({html:contrastRow('Body text / callout background', '#333333',t.calloutBg,4.5),ok:contrastRatio('#333333',t.calloutBg)>=4.5});
+  rows.push({html:contrastRow('Body text / card surface', '#333333',t.cardBg,4.5),ok:contrastRatio('#333333',t.cardBg)>=4.5});
+  $('contrastList').innerHTML=rows.map(r=>r.html).join('');
+  const pass=rows.filter(r=>r.ok).length;
+  $('accessSummary').textContent=pass===rows.length?'All text checks pass':`${pass}/${rows.length} text checks pass`;
+  $('accessSummary').className='access-summary '+(pass===rows.length?'pass':'fail');
+}
+function updateTemplatePreview(){
+  const el=$('templatePreview');
+  if(!el)return;
+  const t=currentTheme();
+  const useSections=!['Native','Light'].includes(t.complexity);
+  let sample=`## Major Section Heading
+
+This is a sample explanatory paragraph showing ordinary Canvas body text.
+
+### Subsection Heading
+
+This smaller section helps organize a longer page without creating another major division.
+
+> **Reminder:** A short callout should draw attention without overwhelming the page.
+
+#### Minor Heading
+
+Use H4 only when the page genuinely needs another level of hierarchy.`;
+  if(advancedEnabled()) sample+=`
+
+[quote]
+A short quotation or creative-text block can appear here.
+[/quote]`;
+  el.innerHTML=t.complexity==='Native'?`<div style="max-width:100%">${renderBody(parseBlocks(sample),useSections)}<hr><p>Example footer</p></div>`:`<div style="max-width:100%">${renderBody(parseBlocks(sample),useSections)}<hr style="border:0;border-top:3px solid ${t.divider};margin:24px 0 12px"><p style="text-align:right">Example footer</p></div>`;
+}
+
+function fillThemeControls(){
+  const t=currentTheme();
+  $('complexity').value=t.complexity;
+  COLOR_FIELDS.forEach(([prop,colorId,hexId])=>{$(colorId).value=t[prop];$(hexId).value=t[prop].toUpperCase();});
+  const selected=themes[$('theme').value];
+  if($('templateTheme'))$('templateTheme').value=$('theme').value;
+  if($('templateThemeNote'))$('templateThemeNote').textContent=t.note;
+  $('templateSource').textContent=selected&&selected.custom?'Saved custom template':'Built-in preset';
+  $('deleteTemplate').disabled=!(selected&&selected.custom);
+  updateAccessibility();
+  updateTemplatePreview();
+}
+function applyBuilderChange(){
+  const base=workingTheme||cloneTheme(themes[$('theme').value]||themes[DEFAULT_THEME]);
+  workingTheme=base;
+  workingTheme.complexity=$('complexity').value;
+  COLOR_FIELDS.forEach(([prop,colorId])=>{workingTheme[prop]=$(colorId).value.toUpperCase();});
+  workingTheme.quoteBorder=workingTheme.divider;
+  workingTheme.note=`Custom ${workingTheme.complexity.toLowerCase()} template based on ${themes[baseThemeKey]?.name||'selected preset'}.`;
+  updateThemeUI(false);updateAccessibility();
+  previewDirty=false;$('previewDirty').classList.add('hidden');generate();
+}
+function selectTheme(key){
+  baseThemeKey=key;
+  workingTheme=cloneTheme(themes[key]||themes[DEFAULT_THEME]);
+  $('themeNote').textContent=workingTheme.note;
+  fillThemeControls();
+  updateThemeUI(false);
+  previewDirty=false;$('previewDirty').classList.add('hidden');generate();
+}
+function makeCustomKey(name){return 'custom_'+name.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')+'_'+Date.now();}
+function templatePayload(t){
+  return {
+    format:'canvas-course-studio-template',version:1,
+    template:{
+      name:t.name,complexity:t.complexity,note:t.note||'',
+      primary:t.primary,accent:t.accent,h3:t.h3,h3Text:t.h3Text,
+      calloutBg:t.calloutBg,calloutBorder:t.calloutBorder,
+      cardBg:t.cardBg,quoteBorder:t.quoteBorder||t.divider,divider:t.divider
+    }
+  };
+}
+function validateTemplateObject(obj){
+  const t=obj&&obj.template?obj.template:obj;
+  if(!t||typeof t!=='object')return {ok:false,error:'Template data is missing.'};
+  const required=['name','complexity','primary','accent','h3','h3Text','calloutBg','calloutBorder','cardBg','divider'];
+  const missing=required.filter(k=>!t[k]);
+  if(missing.length)return {ok:false,error:`Template is missing: ${missing.join(', ')}.`};
+  if(!['Native','Light','Structured','Rich'].includes(t.complexity))return {ok:false,error:'Complexity must be Native, Light, Structured, or Rich.'};
+  const colorKeys=['primary','accent','h3','h3Text','calloutBg','calloutBorder','cardBg','divider'];
+  if(colorKeys.some(k=>!validHex(t[k])))return {ok:false,error:'One or more template colors are not valid six-digit hex colors.'};
+  return {ok:true,theme:{
+    name:String(t.name).trim()||'Imported Template',complexity:t.complexity,note:String(t.note||'Imported template.'),
+    primary:normalizeHex(t.primary),accent:normalizeHex(t.accent),h3:normalizeHex(t.h3),h3Text:normalizeHex(t.h3Text),
+    calloutBg:normalizeHex(t.calloutBg),calloutBorder:normalizeHex(t.calloutBorder),cardBg:normalizeHex(t.cardBg),
+    quoteBorder:validHex(t.quoteBorder||'')?normalizeHex(t.quoteBorder):normalizeHex(t.divider),divider:normalizeHex(t.divider),custom:true
+  }};
+}
+function downloadJson(filename,obj){
+  const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),500);
+}
+function safeFileName(name){return name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'course-studio-template';}
+
+function updateThemeUI(refill=true){
+  const t=currentTheme();
+  $('themeNote').textContent=t.note;
+  if(refill)fillThemeControls();
+
+  // Section styling is distinct from the standalone Card component.
+  // Use audience-facing language instead of implementation terms.
+  const sectionOption=$('sectionStyleOption');
+  if(['Native','Light'].includes(t.complexity)){
+    sectionOption.classList.add('hidden');
+  }else{
+    sectionOption.classList.remove('hidden');
+    $('sectionStyleLabel').textContent=t.complexity==='Structured'
+      ? 'Use outlined section containers'
+      : 'Use card-style section containers';
+  }
+  const isNative=t.complexity==='Native';
+  if($('themeColorControls'))$('themeColorControls').classList.toggle('hidden',isNative);
+  if($('themeAccessibilityControls'))$('themeAccessibilityControls').classList.toggle('hidden',isNative);
+  if($('nativeTemplateNote'))$('nativeTemplateNote').classList.toggle('hidden',!isNative);
+  ['templateNameField','saveTemplate','duplicateTemplate','exportTemplate','resetTemplate','deleteTemplate'].forEach(id=>{
+    if($(id))$(id).classList.toggle('hidden',isNative);
+  });
+}
+
+$('theme').addEventListener('change',()=>selectTheme($('theme').value));
+$('templateTheme').addEventListener('change',()=>{
+  $('theme').value=$('templateTheme').value;
+  selectTheme($('templateTheme').value);
+});
+$('advancedMode').addEventListener('change',()=>{setAdvancedMode($('advancedMode').checked);savePreferences();});
+$('advancedTemplatesToggle').addEventListener('change',()=>{setAdvancedMode($('advancedTemplatesToggle').checked);savePreferences();});
+
+$('complexity').addEventListener('change',applyBuilderChange);
+COLOR_FIELDS.forEach(([prop,colorId,hexId])=>{
+  $(colorId).addEventListener('input',()=>{
+    $(hexId).value=$(colorId).value.toUpperCase();
+    applyBuilderChange();
+  });
+  $(hexId).addEventListener('change',()=>{
+    const h=normalizeHex($(hexId).value);
+    if(!h){$('templateStatus').textContent='Use six-digit hex colors such as #017550.';fillThemeControls();return;}
+    $(hexId).value=h;$(colorId).value=h;applyBuilderChange();
+  });
+});
+
+
+$('loadDvcPresets').addEventListener('click',()=>{
+  Object.entries(OPTIONAL_DVC_THEMES).forEach(([key,t])=>{themes[key]={...cloneTheme(t),custom:true};});
+  try{localStorage.setItem(DVC_PACK_ENABLED_KEY,'true');}catch(e){}
+  saveCustomThemes();
+  rebuildThemeOptions($('theme').value||DEFAULT_THEME);
+  $('templateStatus').textContent='Added DVC Green presets. They now appear under Custom templates.';
+});
+
+$('resetTemplate').addEventListener('click',()=>{
+  const key=$('theme').value;
+  workingTheme=cloneTheme(themes[key]||themes.lightTeal);baseThemeKey=key;
+  fillThemeControls();updateThemeUI(false);generate();
+  $('templateStatus').textContent='Reset to the selected preset.';
+});
+
+$('saveTemplate').addEventListener('click',()=>{
+  const name=$('templateName').value.trim();
+  if(!name){$('templateStatus').textContent='Enter a name for the custom template first.';return;}
+  const key=makeCustomKey(name);
+  themes[key]={...cloneTheme(currentTheme()),name,custom:true,note:`Custom ${currentTheme().complexity.toLowerCase()} template.`};
+  saveCustomThemes();rebuildThemeOptions(key);baseThemeKey=key;workingTheme=cloneTheme(themes[key]);
+  fillThemeControls();updateThemeUI(false);generate();
+  $('templateStatus').textContent=`Saved “${name}” in this browser.`;
+  $('templateName').value='';
+});
+
+$('deleteTemplate').addEventListener('click',()=>{
+  const key=$('theme').value,t=themes[key];
+  if(!t||!t.custom)return;
+  const name=t.name;
+  const isDvc=Object.prototype.hasOwnProperty.call(OPTIONAL_DVC_THEMES,key);
+  const recovery=isDvc
+    ? 'You can add the DVC preset again later with Add DVC Green Presets.'
+    : 'To recover it later, you will need to re-import it or restore it from a Course Studio backup.';
+  if(!confirm(`Remove “${name}” from this browser? ${recovery}`))return;
+  delete themes[key];saveCustomThemes();rebuildThemeOptions(DEFAULT_THEME);selectTheme(DEFAULT_THEME);
+  $('templateStatus').textContent=`Removed “${name}”. ${recovery}`;
+});
+
+$('duplicateTemplate').addEventListener('click',()=>{
+  const source=cloneTheme(currentTheme());
+  const proposed=$('templateName').value.trim()||`${source.name} — Copy`;
+  const key=makeCustomKey(proposed);
+  themes[key]={...source,name:proposed,custom:true,note:`Custom ${source.complexity.toLowerCase()} template duplicated from ${source.name}.`};
+  saveCustomThemes();rebuildThemeOptions(key);baseThemeKey=key;workingTheme=cloneTheme(themes[key]);
+  fillThemeControls();updateThemeUI(false);generate();$('templateName').value='';
+  $('templateStatus').textContent=`Created custom copy “${proposed}”.`;
+});
+
+$('exportTemplate').addEventListener('click',()=>{
+  const t=cloneTheme(currentTheme());
+  downloadJson(`${safeFileName(t.name)}.json`,templatePayload(t));
+  $('templateStatus').textContent=`Exported “${t.name}”.`;
+});
+
+$('importTemplate').addEventListener('click',()=>{$('importTemplateFile').click();});
+$('importTemplateFile').addEventListener('change',async()=>{
+  const file=$('importTemplateFile').files&&$('importTemplateFile').files[0];
+  if(!file)return;
+  try{
+    const parsed=JSON.parse(await file.text());
+    const checked=validateTemplateObject(parsed);
+    if(!checked.ok){$('templateStatus').textContent=`Import failed: ${checked.error}`;return;}
+    const t=checked.theme,key=makeCustomKey(t.name);
+    themes[key]=t;saveCustomThemes();rebuildThemeOptions(key);baseThemeKey=key;workingTheme=cloneTheme(t);
+    fillThemeControls();updateThemeUI(false);generate();
+    const allPass=$('accessSummary').classList.contains('pass');
+    $('templateStatus').textContent=allPass?`Imported “${t.name}”. Accessibility text checks pass.`:`Imported “${t.name}”. Review the accessibility warnings before using it.`;
+  }catch(e){$('templateStatus').textContent='Import failed: the selected file is not valid template JSON.';}
+  finally{$('importTemplateFile').value='';}
+});
+
+function loadCustomSnippets(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(SNIPPET_STORAGE_KEY)||'{}');
+    Object.entries(saved).forEach(([k,v])=>{if(v&&['qa','transparency'].includes(v.type))snippetLibrary[k]={...v,builtIn:false};});
+  }catch(e){}
+}
+function saveCustomSnippets(){
+  const custom={};Object.entries(snippetLibrary).forEach(([k,v])=>{if(!v.builtIn)custom[k]=v;});
+  localStorage.setItem(SNIPPET_STORAGE_KEY,JSON.stringify(custom));
+}
+
+function collectCustomThemes(){
+  const custom={};
+  Object.entries(themes).forEach(([key,t])=>{if(t.custom)custom[key]=cloneTheme(t);});
+  return custom;
+}
+function collectCustomSnippets(){
+  const custom={};
+  Object.entries(snippetLibrary).forEach(([key,sn])=>{if(!sn.builtIn)custom[key]=JSON.parse(JSON.stringify(sn));});
+  return custom;
+}
+function collectPreferences(){
+  return {
+    theme:$('theme')?.value||DEFAULT_THEME,
+    qaSnippet:$('qaSnippetSelect')?.value||'qaDefault',
+    transparencySnippet:$('transparencySnippetSelect')?.value||'transparencyDefault',
+    useSectionContainers:!!$('cards')?.checked,
+    includeQa:!!$('qa')?.checked,
+    includeTransparency:!!$('transparency')?.checked,
+    includeFooter:!!$('includeFooter')?.checked,
+    footerMode:$('footerMode')?.value||'modules',
+    footerLabel:$('modulesLabel')?.value||'← Back to Modules',
+    footerUrl:$('modulesUrl')?.value||'/courses',
+    showAdvanced:advancedEnabled()
+  };
+}
+function savePreferences(){
+  try{localStorage.setItem(PREF_STORAGE_KEY,JSON.stringify(collectPreferences()));}catch(e){}
+}
+function loadPreferences(){
+  try{return JSON.parse(localStorage.getItem(PREF_STORAGE_KEY)||'{}')||{};}catch(e){return {};}
+}
+function applyPreferences(pref){
+  if(!pref||typeof pref!=='object')return;
+  setAdvancedMode(!!pref.showAdvanced);
+  const themeKey=(pref.theme&&themes[pref.theme])?normalizeThemeSelection(pref.theme):DEFAULT_THEME;
+  rebuildThemeOptions(themeKey);selectTheme(themeKey);
+  if($('qaSnippetSelect')&&pref.qaSnippet&&snippetLibrary[pref.qaSnippet])$('qaSnippetSelect').value=pref.qaSnippet;
+  if($('transparencySnippetSelect')&&pref.transparencySnippet&&snippetLibrary[pref.transparencySnippet])$('transparencySnippetSelect').value=pref.transparencySnippet;
+  if(typeof pref.useSectionContainers==='boolean')$('cards').checked=pref.useSectionContainers;
+  if(typeof pref.includeQa==='boolean')$('qa').checked=pref.includeQa;
+  if(typeof pref.includeTransparency==='boolean')$('transparency').checked=pref.includeTransparency;
+  if(typeof pref.includeFooter==='boolean')$('includeFooter').checked=pref.includeFooter;
+  if(pref.footerMode&&[...$('footerMode').options].some(o=>o.value===pref.footerMode))$('footerMode').value=pref.footerMode;
+  if(typeof pref.footerLabel==='string')$('modulesLabel').value=pref.footerLabel;
+  if(typeof pref.footerUrl==='string')$('modulesUrl').value=pref.footerUrl;
+  generate();
+}
+function studioBackupPayload(){
+  return {
+    format:STUDIO_BACKUP_FORMAT,
+    version:STUDIO_BACKUP_VERSION,
+    exportedAt:new Date().toISOString(),
+    appVersion:'0.9.10',
+    customTemplates:collectCustomThemes(),
+    customSnippets:collectCustomSnippets(),
+    preferences:collectPreferences()
+  };
+}
+function validSnippetObject(sn){
+  if(!sn||typeof sn!=='object'||!['qa','transparency'].includes(sn.type))return false;
+  if(typeof sn.name!=='string'||!sn.name.trim())return false;
+  if(sn.type==='qa')return typeof sn.heading==='string'&&typeof sn.body==='string';
+  return typeof sn.text==='string';
+}
+function validateStudioBackup(obj){
+  if(!obj||obj.format!==STUDIO_BACKUP_FORMAT)return {ok:false,error:'This file is not a Course Studio full backup.'};
+  if(obj.version!==STUDIO_BACKUP_VERSION)return {ok:false,error:`Unsupported backup version: ${obj.version}.`};
+  if(!obj.customTemplates||typeof obj.customTemplates!=='object'||Array.isArray(obj.customTemplates))return {ok:false,error:'Backup is missing customTemplates.'};
+  if(!obj.customSnippets||typeof obj.customSnippets!=='object'||Array.isArray(obj.customSnippets))return {ok:false,error:'Backup is missing customSnippets.'};
+  const checkedThemes={};
+  for(const [key,t] of Object.entries(obj.customTemplates)){
+    const checked=validateTemplateObject({template:t});
+    if(!checked.ok)return {ok:false,error:`Template “${t?.name||key}” is invalid: ${checked.error}`};
+    checkedThemes[key]={...checked.theme,custom:true};
+  }
+  const checkedSnippets={};
+  for(const [key,sn] of Object.entries(obj.customSnippets)){
+    if(!validSnippetObject(sn))return {ok:false,error:`Snippet “${sn?.name||key}” is invalid.`};
+    checkedSnippets[key]={...sn,builtIn:false};
+  }
+  return {ok:true,themes:checkedThemes,snippets:checkedSnippets,preferences:(obj.preferences&&typeof obj.preferences==='object')?obj.preferences:{}};
+}
+function replaceCustomData(restored){
+  themes={...BUILTIN_THEMES};
+  Object.entries(restored.themes).forEach(([key,t])=>{themes[key]={...t,custom:true};});
+  snippetLibrary={...BUILTIN_SNIPPETS};
+  Object.entries(restored.snippets).forEach(([key,sn])=>{snippetLibrary[key]={...sn,builtIn:false};});
+  saveCustomThemes();saveCustomSnippets();rebuildThemeOptions(DEFAULT_THEME);rebuildSnippetSelects();applyPreferences(restored.preferences);savePreferences();
+}
+function snippetKey(name){return 'snippet_'+name.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')+'_'+Date.now();}
+function rebuildSnippetSelects(){
+  const qa=$('qaSnippetSelect'),tr=$('transparencySnippetSelect'),base=$('snippetBase');
+  const qaVal=qa.value||'qaDefault',trVal=tr.value||'transparencyDefault';
+  qa.innerHTML='';tr.innerHTML='';
+  Object.entries(snippetLibrary).forEach(([k,v])=>{
+    const o=new Option(v.name,k);if(v.type==='qa')qa.add(o);else tr.add(o);
+  });
+  if([...qa.options].some(o=>o.value===qaVal))qa.value=qaVal;
+  if([...tr.options].some(o=>o.value===trVal))tr.value=trVal;
+  rebuildSnippetBase(base.value);
+}
+function rebuildSnippetBase(preferred){
+  const type=$('snippetType').value,base=$('snippetBase');base.innerHTML='';
+  Object.entries(snippetLibrary).filter(([,v])=>v.type===type).forEach(([k,v])=>base.add(new Option(v.name,k)));
+  if(preferred&&[...base.options].some(o=>o.value===preferred))base.value=preferred;
+  else if(type==='qa'&&[...base.options].some(o=>o.value==='qaDefault'))base.value='qaDefault';
+  else if(type==='transparency'&&[...base.options].some(o=>o.value==='transparencyDefault'))base.value='transparencyDefault';
+  fillSnippetEditor();
+}
+function fillSnippetEditor(){
+  const type=$('snippetType').value,sn=currentSnippet($('snippetBase').value);
+  $('qaSnippetFields').classList.toggle('hidden',type!=='qa');
+  $('transparencySnippetFields').classList.toggle('hidden',type!=='transparency');
+  if(type==='qa'){ $('snippetHeading').value=sn?.heading||'';$('snippetBody').value=sn?.body||''; }
+  else $('snippetTransparencyText').value=sn?.text||'';
+  const isCustom=!!sn&&!sn.builtIn;
+  $('saveSnippet').disabled=!isCustom;
+  $('renameSnippet').disabled=!isCustom;
+  $('deleteSnippet').disabled=!isCustom;
+  $('snippetName').value=isCustom?(sn?.name||''):'';
+  updateSnippetPreview();
+}
+function workingSnippet(){
+  if($('snippetType').value==='qa')return {type:'qa',heading:$('snippetHeading').value.trim(),body:$('snippetBody').value.trim()};
+  return {type:'transparency',text:$('snippetTransparencyText').value.trim()};
+}
+function updateSnippetPreview(){
+  if(!$('snippetPreview'))return;const sn=workingSnippet();
+  $('snippetPreview').innerHTML=sn.type==='qa'?renderQaSnippet(sn):renderTransparencySnippet(sn);
+}
+$('snippetType').addEventListener('change',()=>rebuildSnippetBase());
+$('snippetBase').addEventListener('change',fillSnippetEditor);
+['snippetHeading','snippetBody','snippetTransparencyText'].forEach(id=>$(id).addEventListener('input',updateSnippetPreview));
+$('addSnippet').addEventListener('click',()=>{
+  const name=$('snippetName').value.trim();if(!name){$('snippetStatus').textContent='Enter a name for the new snippet first.';return;}
+  const sn={...workingSnippet(),name,builtIn:false};const key=snippetKey(name);snippetLibrary[key]=sn;saveCustomSnippets();rebuildSnippetSelects();
+  $('snippetBase').value=key;fillSnippetEditor();$('snippetStatus').textContent=`Added “${name}”. It is now available in Build options.`;
+});
+$('saveSnippet').addEventListener('click',()=>{
+  const key=$('snippetBase').value,sn=snippetLibrary[key];if(!sn||sn.builtIn)return;
+  snippetLibrary[key]={...sn,...workingSnippet(),name:sn.name,builtIn:false};saveCustomSnippets();rebuildSnippetSelects();$('snippetBase').value=key;fillSnippetEditor();
+  $('snippetStatus').textContent=`Saved changes to “${sn.name}”.`;
+});
+$('renameSnippet').addEventListener('click',()=>{
+  const key=$('snippetBase').value,sn=snippetLibrary[key];if(!sn||sn.builtIn)return;
+  const name=$('snippetName').value.trim();if(!name){$('snippetStatus').textContent='Enter the new snippet name first.';return;}
+  snippetLibrary[key]={...sn,name};saveCustomSnippets();rebuildSnippetSelects();$('snippetBase').value=key;fillSnippetEditor();
+  $('snippetStatus').textContent=`Renamed snippet to “${name}”.`;
+});
+$('duplicateSnippet').addEventListener('click',()=>{
+  const source=workingSnippet(),base=currentSnippet($('snippetBase').value);const name=$('snippetName').value.trim()||`${base?.name||'Snippet'} — Copy`;
+  const key=snippetKey(name);snippetLibrary[key]={...source,name,builtIn:false};saveCustomSnippets();rebuildSnippetSelects();$('snippetBase').value=key;fillSnippetEditor();$('snippetStatus').textContent=`Created “${name}”.`;
+});
+$('deleteSnippet').addEventListener('click',()=>{
+  const key=$('snippetBase').value,sn=snippetLibrary[key];if(!sn||sn.builtIn)return;delete snippetLibrary[key];saveCustomSnippets();rebuildSnippetSelects();$('snippetStatus').textContent=`Deleted “${sn.name}”.`;
+});
+
+$('exportStudioBackup').addEventListener('click',()=>{
+  const d=new Date();
+  const dateStamp=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  downloadJson(`course_studio_backup_${dateStamp}.json`,studioBackupPayload());
+  $('backupStatus').textContent='Full backup exported.';
+  setTimeout(()=>$('backupStatus').textContent='',1800);
+});
+$('restoreStudioBackup').addEventListener('click',()=>$('restoreStudioBackupFile').click());
+$('restoreStudioBackupFile').addEventListener('change',async()=>{
+  const file=$('restoreStudioBackupFile').files?.[0];if(!file)return;
+  try{
+    const parsed=JSON.parse(await file.text());
+    const checked=validateStudioBackup(parsed);
+    if(!checked.ok){$('restoreStatus').textContent=`Restore failed: ${checked.error}`;return;}
+    const tCount=Object.keys(checked.themes).length,sCount=Object.keys(checked.snippets).length;
+    if(!confirm(`Restore ${tCount} custom template(s) and ${sCount} custom snippet(s)? This replaces the custom data currently saved in this browser.`)){
+      $('restoreStatus').textContent='Restore canceled.';return;
+    }
+    replaceCustomData(checked);
+    $('restoreStatus').textContent=`Restored ${tCount} template(s) and ${sCount} snippet(s).`;
+  }catch(e){$('restoreStatus').textContent='Restore failed: the selected file is not valid backup JSON.';}
+  finally{$('restoreStudioBackupFile').value='';}
+});
+
+$('generate').addEventListener('click',()=>{
+  previewDirty=false;$('previewDirty').classList.add('hidden');generate();
+});
+
+$('clear').addEventListener('click',()=>{
+  $('title').value='';$('content').value='';$('canvasHtml').value='';
+  $('qa').checked=false;$('transparency').checked=false;$('includeFooter').checked=true;$('cards').checked=true;
+  setAdvancedMode(false);
+  $('footerMode').value='modules';$('modulesLabel').value='← Back to Modules';$('modulesUrl').value='/courses';
+  previewDirty=false;$('previewDirty').classList.add('hidden');generate();$('content').focus();
+});
+
+$('importHtml').addEventListener('click',()=>{
+  const raw=$('canvasHtml').value.trim();
+  if(!raw){$('status').textContent='Paste Canvas HTML first';setTimeout(()=>$('status').textContent='',1400);return;}
+  $('content').value=convertCanvasHtml(raw);
+  previewDirty=false;$('previewDirty').classList.add('hidden');generate();
+  $('status').textContent='Imported';setTimeout(()=>$('status').textContent='',1200);
+});
+
+$('copyHtml').addEventListener('click',async()=>{
+  try{
+    await navigator.clipboard.writeText($('htmlOutput').value);
+    $('copyHtml').textContent='Copied';
+    setTimeout(()=>$('copyHtml').textContent='Copy HTML',1000);
+  }catch(e){
+    $('htmlOutput').select();document.execCommand('copy');
+  }
+});
+
+$('copyTitle').addEventListener('click',async()=>{
+  try{
+    await navigator.clipboard.writeText($('title').value);
+    $('copyTitle').textContent='Copied';
+    setTimeout(()=>$('copyTitle').textContent='Copy Canvas Title',1000);
+  }catch(e){}
+});
+
+document.querySelectorAll('.mode-tab').forEach(btn=>btn.addEventListener('click',()=>{
+  document.querySelectorAll('.mode-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.mode-view').forEach(v=>v.classList.remove('active'));
+  btn.classList.add('active');$(btn.dataset.mode).classList.add('active');
+  if(btn.dataset.mode==='templatesMode')updateTemplatePreview();
+  if(btn.dataset.mode==='snippetsMode')updateSnippetPreview();
+  if(btn.dataset.mode==='backupMode')savePreferences();
+}));
+
+document.querySelectorAll('.tab').forEach(btn=>btn.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  btn.classList.add('active');$(btn.dataset.tab).classList.add('active');
+}));
+
+['title','content','cards','qa','transparency','includeFooter','footerMode','modulesLabel','modulesUrl','qaSnippetSelect','transparencySnippetSelect'].forEach(id=>{
+  $(id).addEventListener('input',()=>{generate();savePreferences();updateSnippetPickers();});
+  $(id).addEventListener('change',()=>{generate();savePreferences();updateSnippetPickers();});
+});
+
+loadCustomThemes();
+loadCustomSnippets();
+rebuildThemeOptions(DEFAULT_THEME);
+rebuildSnippetSelects();
+setAdvancedMode(false);
+applyPreferences(loadPreferences());
+updateSnippetPickers();
+savePreferences();
+</script>
+</body>
+</html>
