@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Canvas Course Studio 0.9.10 Release Candidate</title>
+<title>Canvas Course Studio 0.9.16</title>
 <style>
 :root{--bg:#eef1f3;--panel:#fff;--text:#1f2933;--muted:#65727d;--border:#d9dee3;--accent:#2f7f7a;--dark:#3a4a57}
 *{box-sizing:border-box}
@@ -84,7 +84,7 @@ button{border:0;border-radius:8px;padding:10px 14px;font:inherit;font-weight:700
 <body>
 <header>
   <h1>Canvas Course Studio</h1>
-  <p>Release candidate 0.9.10 — Canvas Native template controls streamlined</p>
+  <p>Version 0.9.16 — safer preview editing, contributor footer, and streamlined output controls</p>
 </header>
 
 <nav class="mode-tabs" aria-label="Course Studio workspace">
@@ -159,6 +159,7 @@ button{border:0;border-radius:8px;padding:10px 14px;font:inherit;font-weight:700
   <label class="check"><input type="checkbox" id="qa"> Top-of-page reminder</label>
   <label class="check"><input type="checkbox" id="transparency"> Bottom-of-page note</label>
   <label class="check"><input type="checkbox" id="includeFooter" checked> Include footer</label>
+  <label class="check"><input type="checkbox" id="includeContributor"> Contributor details</label>
 </div>
 <div class="two" style="margin-top:8px">
   <div class="field" id="qaSnippetPicker">
@@ -191,10 +192,20 @@ button{border:0;border-radius:8px;padding:10px 14px;font:inherit;font-weight:700
     <input id="modulesUrl" type="text" value="/courses">
   </div>
 </div>
+<div class="two hidden" id="contributorFields" style="margin-top:8px">
+  <div class="field">
+    <label for="contributorName">Contributed by</label>
+    <input id="contributorName" type="text" placeholder="Name">
+  </div>
+  <div class="field">
+    <label for="lastUpdated">Last updated</label>
+    <input id="lastUpdated" type="text" placeholder="Month Day, Year">
+  </div>
+</div>
+<div class="note hidden" id="contributorNote">Contributor details appear in smaller text on the left; footer navigation appears on its own line at the right.</div>
 
 <div class="actions">
   <button class="primary" id="generate" type="button">Generate</button>
-  <button class="secondary" id="copyTitle" type="button">Copy Canvas Title</button>
   <span class="status" id="status"></span>
 </div>
 
@@ -215,14 +226,14 @@ button{border:0;border-radius:8px;padding:10px 14px;font:inherit;font-weight:700
 
   <div class="preview-tools">
     <label class="check"><input type="checkbox" id="syncScroll" checked> Sync scrolling</label>
-    <button class="secondary" id="applyPreview" type="button">Apply Preview Changes</button>
+    <button class="secondary advanced-only hidden" id="applyPreview" type="button">Import Preview Edits</button>
     <span id="previewDirty" class="dirty hidden">Preview has unapplied edits</span>
   </div>
 
   <div id="previewWrap">
-    <div id="preview" contenteditable="true" aria-label="Editable Canvas preview"></div>
+    <div id="preview" contenteditable="false" aria-label="Canvas preview"></div>
   </div>
-  <div class="note">You can edit directly in the preview. Click <strong>Apply Preview Changes</strong> to convert those edits back into Course Studio markup.</div>
+  <div class="note advanced-only hidden" id="previewEditNote"><strong>Preview edits are approximate.</strong> In Advanced mode, you can make small text edits directly in the preview and use <strong>Import Preview Edits</strong> to translate them back into Course Studio markup. Complex formatting or structural changes may be simplified, so review the Course Studio Body afterward.<br><br><strong>Import Preview Edits replaces the current Course Studio markup with the imported version.</strong> If you make changes in both the Course Studio Body and the preview before importing, some changes may be lost.</div>
 </div>
 
 <div id="htmlView" class="view">
@@ -407,7 +418,7 @@ button{border:0;border-radius:8px;padding:10px 14px;font:inherit;font-weight:700
       <ol>
         <li><strong>Choose a theme.</strong> Use <strong>Canvas Native</strong> for minimally styled semantic HTML, or choose Light or Structured when you want more visual treatment. Turn on Advanced features only if you want richer layout options.</li>
         <li><strong>Write or paste content.</strong> Use the Course Studio body and simple markup, or click <strong>Load Sample Page</strong> to see a working example.</li>
-        <li><strong>Add page-level extras.</strong> Use a top-of-page reminder or bottom-of-page note when you want reusable text outside the main page body.</li>
+        <li><strong>Add page-level extras.</strong> Use a top-of-page reminder, bottom-of-page note, footer navigation, or optional contributor details when useful.</li>
         <li><strong>Preview and copy.</strong> Review the Canvas preview, then copy the generated HTML into Canvas.</li>
         <li><strong>Customize when useful.</strong> The Templates and Snippets workspaces let you save reusable styles and wording. Export a full backup if you create anything you would hate to lose.</li>
       </ol>
@@ -439,13 +450,15 @@ button{border:0;border-radius:8px;padding:10px 14px;font:inherit;font-weight:700
 
       <p><strong>What’s the difference between a bottom-of-page note and a callout?</strong><br>A <strong>Bottom-of-page note</strong> is reusable page-level language—transparency notes, attribution, recurring instructor notes, etc.—that appears near the footer. Callouts belong to the actual instructional content. The default shows an example of instructor transparency about AI use in developing course materials.</p>
 
-      <p><strong>Why are some features hidden until I enable Advanced features?</strong><br>The default interface is meant to stay simple. Advanced mode exposes richer layouts, additional components, and more complex template options when you want them. These templates use more layered HTML, which can break or behave unexpectedly as you manipulate it, and they create a more complicated visual look that may not be every instructor’s preference for their students.</p>
+      <p><strong>Why are some features hidden until I enable Advanced features?</strong><br>The default interface is meant to stay simple. Advanced mode exposes richer layouts, additional components, and editable preview features when you want them. Advanced layouts use more layered HTML, which can behave unexpectedly when edited directly. Preview edits are also approximate: <strong>Import Preview Edits</strong> replaces the current Course Studio markup with a translated version of the preview, so review the Course Studio Body afterward.</p>
 
       <p><strong>Can I break anything in Canvas with the HTML?</strong><br>Usually the worst outcome is that something doesn’t look quite right. Paste into Canvas, preview it there, and adjust as needed. Use the <strong>Course Link</strong> tool in the Rich Content Editor to add links to other pages in the course. Course Studio doesn’t change your Canvas course directly.</p>
 
       <p><strong>Can I import an existing Canvas page?</strong><br>Yes, using <strong>Import Canvas HTML</strong> on the <strong>Build</strong> tab. It works best with HTML that already resembles Course Studio’s structure; unusual Canvas formatting may not round-trip perfectly.</p>
 
-      <p><strong>Should I use H2, H3, and H4 in order?</strong><br>Always—this is a cornerstone of accessible page design. Think of them as Section → Subsection → Minor Heading. That keeps the page structure clear and accessible.</p>
+      <p><strong>Should I use H2, H3, and H4 in order?</strong><br>Yes. Canvas supplies the page H1 through the page title, so Course Studio body content should begin with H2. From there, use H2 → H3 → H4 in order: Section → Subsection → Minor Heading.</p>
+
+      <p><strong>Will contributor details carry over to another page?</strong><br>No. Contributor name and update date are page-specific, so Course Studio starts those fields blank each time you open the tool.</p>
 
       <p><strong>What happens if I import a custom template or DVC preset?</strong><br>It is saved locally in that browser. It does not alter the built-in presets.</p>
 
@@ -628,6 +641,15 @@ function setAdvancedMode(enabled){
   if($('advancedMode'))$('advancedMode').checked=enabled;
   if($('advancedTemplatesToggle'))$('advancedTemplatesToggle').checked=enabled;
   document.querySelectorAll('.advanced-only').forEach(el=>el.classList.toggle('hidden',!enabled));
+  if($('preview')){
+    $('preview').contentEditable=enabled?'true':'false';
+    $('preview').setAttribute('aria-label',enabled?'Editable Canvas preview':'Canvas preview');
+  }
+  if(!enabled && previewDirty){
+    previewDirty=false;
+    if($('previewDirty'))$('previewDirty').classList.add('hidden');
+    generate();
+  }
   if($('advancedBuildNote'))$('advancedBuildNote').textContent=enabled
     ? 'Advanced features are on. Rich example presets, quote blocks, and additional layout controls are available.'
     : 'Advanced features are off. Rich example presets, quote blocks, and advanced layout controls stay hidden until you turn them on.';
@@ -666,6 +688,11 @@ function selectedTransparencySnippet(){return currentSnippet($('transparencySnip
 function updateSnippetPickers(){
   if($('qaSnippetPicker'))$('qaSnippetPicker').classList.toggle('hidden',!$('qa').checked);
   if($('transparencySnippetPicker'))$('transparencySnippetPicker').classList.toggle('hidden',!$('transparency').checked);
+}
+function updateContributorControls(){
+  const show=!!$('includeContributor')?.checked;
+  if($('contributorFields'))$('contributorFields').classList.toggle('hidden',!show);
+  if($('contributorNote'))$('contributorNote').classList.toggle('hidden',!show);
 }
 
 function escapeHtml(str){
@@ -761,14 +788,28 @@ function renderBody(blocks,useContainers){
 function footerHtml(){
   if(!$('includeFooter').checked)return '';
   const mode=$('footerMode').value;
-  if(mode==='none')return '';
+  const includeContributor=$('includeContributor').checked;
   const t=currentTheme();
   const label=$('modulesLabel').value.trim()||'← Back to Modules';
   const url=escapeHtml($('modulesUrl').value.trim()||'/courses');
+  const contributor=escapeHtml($('contributorName').value.trim());
+  const updated=escapeHtml($('lastUpdated').value.trim());
   const parts=[];
   if(mode==='topmodules')parts.push('<a href="#top">&uarr; Back to top</a>');
-  parts.push(`<a href="${url}">${inlineMarkup(label)}</a>`);
-  return t.complexity==='Native'?`<hr />\n<p style="text-align: right;">${parts.join(' | ')}</p>\n`:`<hr style="border: 0; border-top: 3px solid ${t.divider}; margin: 24px 0 12px;" />\n<p style="text-align: right;">${parts.join(' | ')}</p>\n`;
+  if(mode!=='none')parts.push(`<a href="${url}">${inlineMarkup(label)}</a>`);
+  let meta='';
+  if(includeContributor && (contributor||updated)){
+    const lines=[];
+    if(contributor)lines.push(`<strong>Contributed by:</strong> ${contributor}`);
+    if(updated)lines.push(`<strong>Last updated:</strong> ${updated}`);
+    meta=`<p style="font-size: 0.85em; color: #666666; margin-bottom: 8px;">${lines.join('<br />')}</p>\n`;
+  }
+  if(!meta && !parts.length)return '';
+  const divider=t.complexity==='Native'
+    ? '<hr style="border: 0; border-top: 1px solid #cccccc; margin: 24px 0 12px;" />\n'
+    : `<hr style="border: 0; border-top: 3px solid ${t.divider}; margin: 24px 0 12px;" />\n`;
+  const nav=parts.length?`<p style="text-align: right; margin-top: 0;">${parts.join(' | ')}</p>\n`:'';
+  return divider+meta+nav;
 }
 
 function makeHtml(){
@@ -961,7 +1002,7 @@ $('applyPreview').addEventListener('click',()=>{
   previewDirty=false;
   $('previewDirty').classList.add('hidden');
   generate();
-  $('status').textContent='Preview changes applied';
+  $('status').textContent='Preview edits imported';
   setTimeout(()=>$('status').textContent='',1200);
 });
 
@@ -1315,8 +1356,8 @@ function loadPreferences(){
 }
 function applyPreferences(pref){
   if(!pref||typeof pref!=='object')return;
-  setAdvancedMode(!!pref.showAdvanced);
-  const themeKey=(pref.theme&&themes[pref.theme])?normalizeThemeSelection(pref.theme):DEFAULT_THEME;
+  setAdvancedMode(false);
+  const themeKey=DEFAULT_THEME;
   rebuildThemeOptions(themeKey);selectTheme(themeKey);
   if($('qaSnippetSelect')&&pref.qaSnippet&&snippetLibrary[pref.qaSnippet])$('qaSnippetSelect').value=pref.qaSnippet;
   if($('transparencySnippetSelect')&&pref.transparencySnippet&&snippetLibrary[pref.transparencySnippet])$('transparencySnippetSelect').value=pref.transparencySnippet;
@@ -1324,6 +1365,10 @@ function applyPreferences(pref){
   if(typeof pref.includeQa==='boolean')$('qa').checked=pref.includeQa;
   if(typeof pref.includeTransparency==='boolean')$('transparency').checked=pref.includeTransparency;
   if(typeof pref.includeFooter==='boolean')$('includeFooter').checked=pref.includeFooter;
+  $('includeContributor').checked=false;
+  $('contributorName').value='';
+  $('lastUpdated').value='';
+  updateContributorControls();
   if(pref.footerMode&&[...$('footerMode').options].some(o=>o.value===pref.footerMode))$('footerMode').value=pref.footerMode;
   if(typeof pref.footerLabel==='string')$('modulesLabel').value=pref.footerLabel;
   if(typeof pref.footerUrl==='string')$('modulesUrl').value=pref.footerUrl;
@@ -1334,7 +1379,7 @@ function studioBackupPayload(){
     format:STUDIO_BACKUP_FORMAT,
     version:STUDIO_BACKUP_VERSION,
     exportedAt:new Date().toISOString(),
-    appVersion:'0.9.10',
+    appVersion:'0.9.16',
     customTemplates:collectCustomThemes(),
     customSnippets:collectCustomSnippets(),
     preferences:collectPreferences()
@@ -1469,8 +1514,9 @@ $('generate').addEventListener('click',()=>{
 
 $('clear').addEventListener('click',()=>{
   $('title').value='';$('content').value='';$('canvasHtml').value='';
-  $('qa').checked=false;$('transparency').checked=false;$('includeFooter').checked=true;$('cards').checked=true;
+  $('qa').checked=false;$('transparency').checked=false;$('includeFooter').checked=true;$('includeContributor').checked=false;$('cards').checked=true;
   setAdvancedMode(false);
+  $('contributorName').value='';$('lastUpdated').value='';
   $('footerMode').value='modules';$('modulesLabel').value='← Back to Modules';$('modulesUrl').value='/courses';
   previewDirty=false;$('previewDirty').classList.add('hidden');generate();$('content').focus();
 });
@@ -1493,14 +1539,6 @@ $('copyHtml').addEventListener('click',async()=>{
   }
 });
 
-$('copyTitle').addEventListener('click',async()=>{
-  try{
-    await navigator.clipboard.writeText($('title').value);
-    $('copyTitle').textContent='Copied';
-    setTimeout(()=>$('copyTitle').textContent='Copy Canvas Title',1000);
-  }catch(e){}
-});
-
 document.querySelectorAll('.mode-tab').forEach(btn=>btn.addEventListener('click',()=>{
   document.querySelectorAll('.mode-tab').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.mode-view').forEach(v=>v.classList.remove('active'));
@@ -1516,9 +1554,9 @@ document.querySelectorAll('.tab').forEach(btn=>btn.addEventListener('click',()=>
   btn.classList.add('active');$(btn.dataset.tab).classList.add('active');
 }));
 
-['title','content','cards','qa','transparency','includeFooter','footerMode','modulesLabel','modulesUrl','qaSnippetSelect','transparencySnippetSelect'].forEach(id=>{
-  $(id).addEventListener('input',()=>{generate();savePreferences();updateSnippetPickers();});
-  $(id).addEventListener('change',()=>{generate();savePreferences();updateSnippetPickers();});
+['title','content','cards','qa','transparency','includeFooter','includeContributor','contributorName','lastUpdated','footerMode','modulesLabel','modulesUrl','qaSnippetSelect','transparencySnippetSelect'].forEach(id=>{
+  $(id).addEventListener('input',()=>{generate();savePreferences();updateSnippetPickers();updateContributorControls();});
+  $(id).addEventListener('change',()=>{generate();savePreferences();updateSnippetPickers();updateContributorControls();});
 });
 
 loadCustomThemes();
@@ -1528,6 +1566,7 @@ rebuildSnippetSelects();
 setAdvancedMode(false);
 applyPreferences(loadPreferences());
 updateSnippetPickers();
+updateContributorControls();
 savePreferences();
 </script>
 </body>
