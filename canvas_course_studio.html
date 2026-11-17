@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Canvas Course Studio 0.9.16</title>
+<title>Canvas Course Studio 0.9.17</title>
 <style>
 :root{--bg:#eef1f3;--panel:#fff;--text:#1f2933;--muted:#65727d;--border:#d9dee3;--accent:#2f7f7a;--dark:#3a4a57}
 *{box-sizing:border-box}
@@ -84,7 +84,7 @@ button{border:0;border-radius:8px;padding:10px 14px;font:inherit;font-weight:700
 <body>
 <header>
   <h1>Canvas Course Studio</h1>
-  <p>Version 0.9.16 — safer preview editing, contributor footer, and streamlined output controls</p>
+  <p>Version 0.9.17 — consistent Rich card outlines</p>
 </header>
 
 <nav class="mode-tabs" aria-label="Course Studio workspace">
@@ -666,7 +666,7 @@ function themeStyle(kind){
   if(t.complexity==='Native') return '';
   if(kind==='h3') return `background: ${t.h3}; padding: 6px 15px; color: ${t.h3Text}; margin-top: 16px;`;
   if(kind==='callout') return `background: ${t.calloutBg}; border-left: 5px solid ${t.calloutBorder}; padding: 8px 15px; margin: 14px 0px;`;
-  if(kind==='card') return `background: ${t.cardBg}; margin-top: 12px; padding: 12px;${t.complexity==='Rich'?' border-radius: 10px;':''}${t.complexity==='Structured'?` border: 1px solid ${t.h3};`:''}`;
+  if(kind==='card') return `background: ${t.cardBg}; margin-top: 12px; padding: 12px;${t.complexity==='Rich'?' border-radius: 10px; border: 1px solid #dddddd;':''}${t.complexity==='Structured'?` border: 1px solid ${t.h3};`:''}`;
   if(kind==='quote') return `background: #ffffff; border-left: 4px solid ${t.quoteBorder}; margin: 10px 0px; padding: 12px 15px;`;
   return '';
 }
