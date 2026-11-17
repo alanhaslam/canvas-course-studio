@@ -4,8 +4,6 @@
 
 - Added the same thin neutral outline to standalone **[card]** blocks in Rich/Advanced templates that Rich H2 section containers already use, making card containment visually consistent.
 
-# Changelog
-
 ## v0.9.16
 
 - Moved preview editing behind **Advanced** and renamed the action to **Import Preview Edits**.
