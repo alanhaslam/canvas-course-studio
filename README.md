@@ -6,7 +6,7 @@ It uses simple markup and a live preview to generate Canvas-ready HTML. Users ca
 
 ## Current version
 
-**v0.9.16**
+**v0.9.17**
 
 The current source is available in this repository as [`canvas_course_studio.html`](canvas_course_studio.html).
 
