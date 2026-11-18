@@ -2,11 +2,11 @@
 
 **Canvas Course Studio** is a free, offline tool for creating consistent, accessible, and visually organized Canvas pages without requiring users to write HTML from scratch.
 
-It uses simple markup and a live preview to generate Canvas-ready HTML. Users can start with Canvas-native structure, restrained built-in presets, create or import custom templates, save reusable reminders and notes, and enable more advanced layouts when needed.
+It uses simple markup and a live preview to generate Canvas-ready HTML. Users can start with Canvas-native structure, restrained built-in presets, create or import custom themes, save reusable reminders and notes, and enable more advanced layouts when needed.
 
 ## Current version
 
-**v0.9.18**
+**v0.9.21**
 
 The current source is available in this repository as [`canvas_course_studio.html`](canvas_course_studio.html).
 
@@ -33,11 +33,11 @@ Canvas Course Studio can:
 - add callouts, lists, reminders, notes, contributor details, and navigation
 - use Canvas Native, Light, and Structured presets
 - expose richer layouts and preview editing through optional Advanced features
-- create, import, export, and remove custom templates
+- create, import, export, and remove custom themes
 - add optional DVC Green presets
 - save reusable top-of-page reminders and bottom-of-page notes
 - import existing Canvas HTML for editing
-- export and restore backups of custom templates, snippets, and preferences
+- export and restore backups of custom themes, snippets, and preferences
 
 ## Privacy and offline use
 
@@ -66,7 +66,7 @@ Preview import is approximate. Complex formatting or structural changes may be s
 
 ## Backups
 
-Course Studio stores custom templates, snippets, and preferences locally in the browser. They do not automatically follow users to another browser or computer.
+Course Studio stores custom themes, snippets, and preferences locally in the browser. They do not automatically follow users to another browser or computer.
 
 Use **Backup → Export Full Backup** to create a dated JSON backup file. Store that file somewhere already protected by a normal backup or cloud-storage workflow, then use **Restore Full Backup** when needed.
 
