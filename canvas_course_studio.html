@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Canvas Course Studio 0.9.17</title>
+<title>Canvas Course Studio 0.9.18</title>
 <style>
 :root{--bg:#eef1f3;--panel:#fff;--text:#1f2933;--muted:#65727d;--border:#d9dee3;--accent:#2f7f7a;--dark:#3a4a57}
 *{box-sizing:border-box}
@@ -84,7 +84,7 @@ button{border:0;border-radius:8px;padding:10px 14px;font:inherit;font-weight:700
 <body>
 <header>
   <h1>Canvas Course Studio</h1>
-  <p>Version 0.9.17 — consistent Rich card outlines</p>
+  <p>Version 0.9.18 — clean public template migration</p>
 </header>
 
 <nav class="mode-tabs" aria-label="Course Studio workspace">
@@ -545,7 +545,8 @@ const OPTIONAL_DVC_THEMES={
 let themes={...BUILTIN_THEMES};
 let workingTheme=null;
 let baseThemeKey='lightTeal';
-const CUSTOM_STORAGE_KEY='courseStudioReleaseCustomThemes_v098';
+const CUSTOM_STORAGE_KEY='courseStudioReleaseCustomThemes_v099';
+const PREVIOUS_CUSTOM_STORAGE_KEY='courseStudioReleaseCustomThemes_v098';
 const LEGACY_CUSTOM_STORAGE_KEY='courseStudioReleaseCustomThemes_v090';
 const DVC_PACK_ENABLED_KEY='courseStudioReleaseDvcPackEnabled_v096';
 
@@ -560,11 +561,14 @@ function loadCustomThemes(){
     if(raw){
       saved=JSON.parse(raw||'{}');
     }else{
-      // One-time migration from the earlier release namespace. Preserve ordinary
-      // custom templates, but deliberately leave Alan House Style out of the
-      // shareable release state. It can still be imported or restored explicitly.
-      const legacy=JSON.parse(localStorage.getItem(LEGACY_CUSTOM_STORAGE_KEY)||'{}');
-      Object.entries(legacy).forEach(([key,t])=>{
+      // One-time migration into a clean public release namespace. Preserve ordinary
+      // custom templates, but deliberately leave Alan House Style out so a personal
+      // preset from an earlier browser session cannot appear automatically in the
+      // public release. It can still be imported explicitly when wanted.
+      const previousRaw=localStorage.getItem(PREVIOUS_CUSTOM_STORAGE_KEY);
+      const legacyRaw=localStorage.getItem(LEGACY_CUSTOM_STORAGE_KEY);
+      const previous=JSON.parse(previousRaw||legacyRaw||'{}');
+      Object.entries(previous).forEach(([key,t])=>{
         if(!isLegacyAlanHouseStyle(t))saved[key]=t;
       });
       localStorage.setItem(CUSTOM_STORAGE_KEY,JSON.stringify(saved));
@@ -1379,7 +1383,7 @@ function studioBackupPayload(){
     format:STUDIO_BACKUP_FORMAT,
     version:STUDIO_BACKUP_VERSION,
     exportedAt:new Date().toISOString(),
-    appVersion:'0.9.16',
+    appVersion:'0.9.18',
     customTemplates:collectCustomThemes(),
     customSnippets:collectCustomSnippets(),
     preferences:collectPreferences()
