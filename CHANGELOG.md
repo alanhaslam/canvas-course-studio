@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.9.21
+
+- Reworked the top workspace header so Theme and Advanced controls use previously empty header space and align with the Build/Preview two-column layout.
+- Renamed the visual-design system consistently from **template** to **theme** in user-facing navigation, controls, help, and backup language.
+- Renamed the workspace to **Themes** and **Theme Creator**.
+- Added explicit cross-browser styling for the header Theme dropdown so Chrome and Firefox render readable text consistently.
+- Kept Section containers contextual to Advanced mode without changing existing rendering behavior.
+
 ## v0.9.18
 
 - Isolated public-release custom-template storage from earlier personal browser state so **Alan House Style** cannot appear automatically in a clean public release migration.
