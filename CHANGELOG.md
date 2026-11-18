@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.9.18
+
+- Isolated public-release custom-template storage from earlier personal browser state so **Alan House Style** cannot appear automatically in a clean public release migration.
+- Preserves ordinary custom templates during migration while leaving the personal Alan House Style preset behind unless it is explicitly imported again.
+
 ## v0.9.17
 
 - Added the same thin neutral outline to standalone **[card]** blocks in Rich/Advanced templates that Rich H2 section containers already use, making card containment visually consistent.
