@@ -3,14 +3,26 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Canvas Course Studio 0.9.18</title>
+<title>Canvas Course Studio 0.9.21</title>
 <style>
 :root{--bg:#eef1f3;--panel:#fff;--text:#1f2933;--muted:#65727d;--border:#d9dee3;--accent:#2f7f7a;--dark:#3a4a57}
 *{box-sizing:border-box}
 body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
-header{background:var(--dark);color:#fff;padding:18px 24px}
+header{background:var(--dark);color:#fff;padding:12px 18px}
+.header-bar{display:grid;grid-template-columns:minmax(360px,.95fr) minmax(500px,1.05fr);gap:18px;align-items:center}
+.header-brand{grid-column:1;min-width:0}
 header h1{margin:0;font-size:24px}
-header p{margin:4px 0 0;color:#e3eaee;font-size:14px}
+header p{margin:3px 0 0;color:#e3eaee;font-size:13px}
+.header-controls{grid-column:2;display:flex;align-items:end;justify-content:flex-start;gap:16px;flex-wrap:wrap;min-width:0}
+.header-control{min-width:220px}
+.header-control.compact{min-width:auto}
+.header-control label{color:#fff;font-size:13px;margin-bottom:5px}
+.header-control select{min-width:300px;padding:8px 10px;background:#fff;color:var(--text);border-color:#bfc7cd;color-scheme:light}
+.header-control select option{background:#fff;color:var(--text)}
+.header-check{display:flex;align-items:center;gap:8px;color:#fff;font-weight:600;white-space:normal;padding:8px 0 7px;line-height:1.1}
+.header-check input{margin:0}
+.header-check span{font-size:14px;max-width:88px}
+@media (max-width:980px){.header-bar{grid-template-columns:1fr;gap:12px}.header-brand,.header-controls{grid-column:1}.header-controls{justify-content:flex-start;width:100%}.header-control{min-width:min(100%,260px)}.header-control select{min-width:0}}
 .app{display:grid;grid-template-columns:minmax(360px,.95fr) minmax(500px,1.05fr);gap:18px;padding:18px}
 .panel{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden}
 .panel-head{padding:14px 16px;border-bottom:1px solid var(--border);font-weight:700}
@@ -83,13 +95,35 @@ button{border:0;border-radius:8px;padding:10px 14px;font:inherit;font-weight:700
 </head>
 <body>
 <header>
-  <h1>Canvas Course Studio</h1>
-  <p>Version 0.9.18 — clean public template migration</p>
+  <div class="header-bar">
+    <div class="header-brand">
+      <h1>Canvas Course Studio</h1>
+      <p>Version 0.9.20</p>
+    </div>
+    <div class="header-controls" aria-label="Workspace controls">
+      <div class="header-control">
+        <label for="theme">Theme</label>
+        <select id="theme">
+          <option value="canvasNative">Canvas Native</option>
+          <option value="lightTeal" selected>Light — Teal</option>
+          <option value="lightGraphite">Light — Graphite + Blue</option>
+          <option value="structuredTeal">Structured — Teal</option>
+          <option value="structuredGraphite">Structured — Graphite + Blue</option>
+        </select>
+      </div>
+      <div class="header-control compact">
+        <label class="header-check"><input type="checkbox" id="advancedMode"> <span>Advanced features</span></label>
+      </div>
+      <div class="header-control compact hidden" id="sectionStyleOption">
+        <label class="header-check"><input type="checkbox" id="cards" checked> <span id="sectionStyleLabel">Section containers</span></label>
+      </div>
+    </div>
+  </div>
 </header>
 
 <nav class="mode-tabs" aria-label="Course Studio workspace">
   <button class="mode-tab active" data-mode="buildMode" type="button">Build</button>
-  <button class="mode-tab" data-mode="templatesMode" type="button">Templates</button>
+  <button class="mode-tab" data-mode="templatesMode" type="button">Themes</button>
   <button class="mode-tab" data-mode="snippetsMode" type="button">Snippets</button>
   <button class="mode-tab" data-mode="backupMode" type="button">Backup</button>
   <button class="mode-tab" data-mode="aboutMode" type="button">About</button>
@@ -100,23 +134,6 @@ button{border:0;border-radius:8px;padding:10px 14px;font:inherit;font-weight:700
 <section class="panel">
 <div class="panel-head">Build Canvas content</div>
 <div class="panel-body">
-
-<div class="field">
-  <label for="theme">Theme preset</label>
-  <select id="theme">
-    <option value="canvasNative">Canvas Native</option>
-    <option value="lightTeal" selected>Light — Teal</option>
-    <option value="lightGraphite">Light — Graphite + Blue</option>
-    <option value="structuredTeal">Structured — Teal</option>
-    <option value="structuredGraphite">Structured — Graphite + Blue</option>
-  </select>
-  <div class="note" id="themeNote">Choose Canvas Native for minimally styled Canvas HTML, or start with one of four restrained visual presets. Advanced examples stay hidden unless you turn them on.</div>
-</div>
-
-<div class="field">
-  <label class="check"><input type="checkbox" id="advancedMode"> <span>Enable advanced features</span></label>
-  <div class="note" id="advancedBuildNote">Advanced features are off. Rich example presets, quote blocks, and advanced layout controls stay hidden until you turn them on.</div>
-</div>
 
 <div class="field">
   <label for="title">Canvas title <span style="font-weight:500;color:var(--muted);">(optional)</span></label>
@@ -155,7 +172,6 @@ button{border:0;border-radius:8px;padding:10px 14px;font:inherit;font-weight:700
 
 <label style="margin-top:14px">Options</label>
 <div class="checks">
-  <label class="check" id="sectionStyleOption"><input type="checkbox" id="cards" checked> <span id="sectionStyleLabel">Use enhanced section styling</span></label>
   <label class="check"><input type="checkbox" id="qa"> Top-of-page reminder</label>
   <label class="check"><input type="checkbox" id="transparency"> Bottom-of-page note</label>
   <label class="check"><input type="checkbox" id="includeFooter" checked> Include footer</label>
@@ -247,17 +263,17 @@ button{border:0;border-radius:8px;padding:10px 14px;font:inherit;font-weight:700
 <div id="templatesMode" class="mode-view">
 <main class="template-app">
   <section class="panel">
-    <div class="panel-head">Create or edit a template</div>
+    <div class="panel-head">Create or edit a theme</div>
     <div class="panel-body">
 <div class="theme-builder">
-  <h3>Template Creator</h3>
-  <p class="intro">Start with Canvas Native or one of the streamlined visual presets. Canvas Native keeps the generated HTML close to Canvas defaults; visual presets can be customized, checked for contrast, and saved as named templates. Built-in presets are never overwritten. Advanced rich examples stay hidden unless you turn them on.</p>
+  <h3>Theme Creator</h3>
+  <p class="intro">Start with Canvas Native or one of the streamlined visual presets. Canvas Native keeps the generated HTML close to Canvas defaults; visual presets can be customized, checked for contrast, and saved as named themes. Built-in presets are never overwritten. Advanced rich examples stay hidden unless you turn them on.</p>
   <div class="field">
-    <label class="check"><input type="checkbox" id="advancedTemplatesToggle"> <span>Enable advanced features in Template Creator</span></label>
+    <label class="check"><input type="checkbox" id="advancedTemplatesToggle"> <span>Enable advanced features in Theme Creator</span></label>
     <div class="note">Keep this off for a lighter release workflow. Turn it on to expose rich example presets and Rich complexity.</div>
   </div>
   <div class="field">
-    <label for="templateTheme">Base preset / template</label>
+    <label for="templateTheme">Base preset / theme</label>
     <select id="templateTheme"></select>
     <div class="note" id="templateThemeNote"></div>
   </div>
@@ -286,20 +302,20 @@ button{border:0;border-radius:8px;padding:10px 14px;font:inherit;font-weight:700
     <div class="contrast-list" id="contrastList"></div>
     <div class="note">Text combinations are checked against WCAG contrast thresholds: 4.5:1 for normal text and 3:1 for large heading text. Borders and decorative accents are shown but are not treated as text.</div>
   </div>
-  <div class="note hidden" id="nativeTemplateNote">Canvas Native uses Canvas's default appearance and does not save visual template settings.</div>
+  <div class="note hidden" id="nativeTemplateNote">Canvas Native uses Canvas's default appearance and does not save visual theme settings.</div>
   <div class="template-actions">
-    <div class="field" id="templateNameField"><label for="templateName">Custom template name</label><input id="templateName" type="text" placeholder="e.g., Literature — Forest"></div>
-    <button class="primary small-btn" id="saveTemplate" type="button">Save Template</button>
+    <div class="field" id="templateNameField"><label for="templateName">Custom theme name</label><input id="templateName" type="text" placeholder="e.g., Literature — Forest"></div>
+    <button class="primary small-btn" id="saveTemplate" type="button">Save Theme</button>
     <button class="secondary small-btn" id="duplicateTemplate" type="button">Duplicate</button>
     <button class="secondary small-btn" id="exportTemplate" type="button">Export</button>
     <button class="secondary small-btn" id="importTemplate" type="button">Import</button>
     <button class="secondary small-btn" id="loadDvcPresets" type="button">Add DVC Green Presets</button>
     <input class="hidden" id="importTemplateFile" type="file" accept="application/json,.json">
-    <button class="secondary small-btn" id="resetTemplate" type="button">Reset to Preset</button>
-    <button class="danger small-btn" id="deleteTemplate" type="button" disabled>Remove Template</button>
+    <button class="secondary small-btn" id="resetTemplate" type="button">Reset Theme</button>
+    <button class="danger small-btn" id="deleteTemplate" type="button" disabled>Remove Theme</button>
   </div>
   <div class="note" id="templateStatus"></div>
-  <div class="note">Built-in presets cannot be removed; use <strong>Reset to Preset</strong> to return one to its original settings. DVC presets are optional and can be added again at any time. Imported or other custom templates that you remove must be re-imported or restored from a Course Studio backup if you want them back.</div>
+  <div class="note">Built-in presets cannot be removed; use <strong>Reset Theme</strong> to return one to its original settings. DVC presets are optional and can be added again at any time. Imported or other custom themes that you remove must be re-imported or restored from a Course Studio backup if you want them back.</div>
 </div>
 
     </div>
@@ -307,7 +323,7 @@ button{border:0;border-radius:8px;padding:10px 14px;font:inherit;font-weight:700
   <section class="panel">
     <div class="panel-head">Theme preview</div>
     <div class="panel-body">
-      <div class="template-preview-note">This sample page shows how the selected template treats common Canvas components.</div>
+      <div class="template-preview-note">This sample page shows how the selected theme treats common Canvas components.</div>
       <div id="templatePreview" class="template-preview-wrap"></div>
     </div>
   </section>
@@ -363,10 +379,10 @@ button{border:0;border-radius:8px;padding:10px 14px;font:inherit;font-weight:700
   <section class="panel">
     <div class="panel-head">Back up Course Studio</div>
     <div class="panel-body">
-      <p class="intro">Create one portable backup containing all custom templates and snippets plus your current Studio selections.</p>
+      <p class="intro">Create one portable backup containing all custom themes and snippets plus your current Studio selections.</p>
       <div class="title-preview">
         <strong>What the backup includes</strong>
-        <span>Custom templates, custom snippets, selected theme, selected top-of-page reminder preset, selected bottom-of-page note preset, and common Build preferences.</span>
+        <span>Custom themes, custom snippets, selected theme, selected top-of-page reminder preset, selected bottom-of-page note preset, and common Build preferences.</span>
       </div>
       <div class="title-preview">
         <strong>Where does the backup go?</strong>
@@ -374,13 +390,13 @@ button{border:0;border-radius:8px;padding:10px 14px;font:inherit;font-weight:700
       </div>
       <div class="title-preview">
         <strong>Recommended backup workflow</strong>
-        <span><strong>1. Export</strong> your current Course Studio settings. <strong>2. Store</strong> the JSON file somewhere you already back up regularly, such as OneDrive, Dropbox, Google Drive, or an institutional network drive. <strong>3. Restore</strong> that file later if you need to recover your templates, snippets, or preferences.</span>
+        <span><strong>1. Export</strong> your current Course Studio settings. <strong>2. Store</strong> the JSON file somewhere you already back up regularly, such as OneDrive, Dropbox, Google Drive, or an institutional network drive. <strong>3. Restore</strong> that file later if you need to recover your themes, snippets, or preferences.</span>
       </div>
       <div class="actions" style="margin-top:14px">
         <button class="primary" id="exportStudioBackup" type="button">Export Full Backup</button>
         <span class="status" id="backupStatus"></span>
       </div>
-      <div class="note" style="margin-top:12px">Backup filenames include the export date, for example <strong>course_studio_backup_2026-11-16.json</strong>. Export a fresh copy after meaningful template or snippet changes you would not want to recreate.</div>
+      <div class="note" style="margin-top:12px">Backup filenames include the export date, for example <strong>course_studio_backup_2026-11-16.json</strong>. Export a fresh copy after meaningful theme or snippet changes you would not want to recreate.</div>
     </div>
   </section>
 
@@ -393,7 +409,7 @@ button{border:0;border-radius:8px;padding:10px 14px;font:inherit;font-weight:700
         <button class="secondary" id="restoreStudioBackup" type="button">Restore Full Backup</button>
         <span class="status" id="restoreStatus"></span>
       </div>
-      <div class="note" style="margin-top:12px">Restore replaces the current browser's custom templates and custom snippets with the contents of the backup. Built-in presets and built-in snippets are never modified.</div>
+      <div class="note" style="margin-top:12px">Restore replaces the current browser's custom themes and custom snippets with the contents of the backup. Built-in presets and built-in snippets are never modified.</div>
     </div>
   </section>
 </main>
@@ -405,7 +421,7 @@ button{border:0;border-radius:8px;padding:10px 14px;font:inherit;font-weight:700
     <div class="panel-head">About Canvas Course Studio</div>
     <div class="panel-body">
       <p>Canvas Course Studio is an offline tool for creating consistent Canvas pages quickly. It uses simple markup to translate ordinary text into Canvas-ready HTML, from minimally styled Canvas-native structure to more advanced visual layouts.</p>
-      <p>Canvas Course Studio was developed with ChatGPT as a development tool, but the Studio itself does not connect to ChatGPT, Canvas, or any other online service. It works without an internet connection. User-created content, templates, snippets, preferences, and backups remain local unless the user chooses to copy, export, upload, or share them independently.</p>
+      <p>Canvas Course Studio was developed with ChatGPT as a development tool, but the Studio itself does not connect to ChatGPT, Canvas, or any other online service. It works without an internet connection. User-created content, themes, snippets, preferences, and backups remain local unless the user chooses to copy, export, upload, or share them independently.</p>
       <div class="title-preview" style="margin-top:16px">
         <strong>© 2026 Alan Haslam</strong>
         <span>Canvas Course Studio software is licensed under the MIT License. Documentation and sample content are licensed under Creative Commons Attribution 4.0 International (CC BY 4.0).</span>
@@ -420,7 +436,7 @@ button{border:0;border-radius:8px;padding:10px 14px;font:inherit;font-weight:700
         <li><strong>Write or paste content.</strong> Use the Course Studio body and simple markup, or click <strong>Load Sample Page</strong> to see a working example.</li>
         <li><strong>Add page-level extras.</strong> Use a top-of-page reminder, bottom-of-page note, footer navigation, or optional contributor details when useful.</li>
         <li><strong>Preview and copy.</strong> Review the Canvas preview, then copy the generated HTML into Canvas.</li>
-        <li><strong>Customize when useful.</strong> The Templates and Snippets workspaces let you save reusable styles and wording. Export a full backup if you create anything you would hate to lose.</li>
+        <li><strong>Customize when useful.</strong> The Themes and Snippets workspaces let you save reusable styles and wording. Export a full backup if you create anything you would hate to lose.</li>
       </ol>
       <p class="note">Canvas Course Studio does not publish directly to Canvas. You remain in control of what is copied, exported, or shared.</p>
     </div>
@@ -444,7 +460,7 @@ button{border:0;border-radius:8px;padding:10px 14px;font:inherit;font-weight:700
       <h3 style="margin-top:24px">FAQ</h3>
       <p><strong>“Back to Modules” looks like a link, but it won’t know your Canvas course automatically.</strong><br>Course Studio is offline, so you’ll need to replace the footer URL in Canvas with the correct course Modules link.</p>
 
-      <p><strong>Will my custom templates and snippets follow me to another computer/browser?</strong><br>Not automatically. Use <strong>Backup → Export Full Backup</strong>, then restore that file on the other browser/computer.</p>
+      <p><strong>Will my custom themes and snippets follow me to another computer/browser?</strong><br>Not automatically. Use <strong>Backup → Export Full Backup</strong>, then restore that file on the other browser/computer.</p>
 
       <p><strong>What’s the difference between a callout and a top-of-page reminder?</strong><br>A callout is part of the page body and goes wherever you insert it. A <strong>Top-of-page reminder</strong> is a reusable page-level message that Course Studio places near the beginning of the page automatically. The default shows an example “get in touch with questions” reminder.</p>
 
@@ -460,9 +476,9 @@ button{border:0;border-radius:8px;padding:10px 14px;font:inherit;font-weight:700
 
       <p><strong>Will contributor details carry over to another page?</strong><br>No. Contributor name and update date are page-specific, so Course Studio starts those fields blank each time you open the tool.</p>
 
-      <p><strong>What happens if I import a custom template or DVC preset?</strong><br>It is saved locally in that browser. It does not alter the built-in presets.</p>
+      <p><strong>What happens if I import a custom theme or DVC preset?</strong><br>It is saved locally in that browser. It does not alter the built-in presets.</p>
 
-      <p><strong>Where should I keep my Course Studio backup file?</strong><br>Somewhere you already back up regularly. Export a fresh one after making custom templates or snippets you would not want to recreate.</p>
+      <p><strong>Where should I keep my Course Studio backup file?</strong><br>Somewhere you already back up regularly. Export a fresh one after making custom themes or snippets you would not want to recreate.</p>
     </div>
   </section>
 </main>
@@ -562,7 +578,7 @@ function loadCustomThemes(){
       saved=JSON.parse(raw||'{}');
     }else{
       // One-time migration into a clean public release namespace. Preserve ordinary
-      // custom templates, but deliberately leave Alan House Style out so a personal
+      // custom themes, but deliberately leave Alan House Style out so a personal
       // preset from an earlier browser session cannot appear automatically in the
       // public release. It can still be imported explicitly when wanted.
       const previousRaw=localStorage.getItem(PREVIOUS_CUSTOM_STORAGE_KEY);
@@ -613,7 +629,7 @@ function populateThemeSelect(sel,selected){
   });
   const customEntries=Object.entries(themes).filter(([,t])=>t.custom);
   if(customEntries.length){
-    const group=document.createElement('optgroup');group.label='Custom templates';
+    const group=document.createElement('optgroup');group.label='Custom themes';
     customEntries.forEach(([key,t])=>{const o=document.createElement('option');o.value=key;o.textContent=t.name;group.appendChild(o);});
     sel.appendChild(group);
   }
@@ -654,9 +670,6 @@ function setAdvancedMode(enabled){
     if($('previewDirty'))$('previewDirty').classList.add('hidden');
     generate();
   }
-  if($('advancedBuildNote'))$('advancedBuildNote').textContent=enabled
-    ? 'Advanced features are on. Rich example presets, quote blocks, and additional layout controls are available.'
-    : 'Advanced features are off. Rich example presets, quote blocks, and advanced layout controls stay hidden until you turn them on.';
   refreshComplexityOptions();
   updateContentHelp();
   const selected=normalizeThemeSelection($('theme')?.value||$('templateTheme')?.value||DEFAULT_THEME);
@@ -1138,7 +1151,7 @@ function fillThemeControls(){
   const selected=themes[$('theme').value];
   if($('templateTheme'))$('templateTheme').value=$('theme').value;
   if($('templateThemeNote'))$('templateThemeNote').textContent=t.note;
-  $('templateSource').textContent=selected&&selected.custom?'Saved custom template':'Built-in preset';
+  $('templateSource').textContent=selected&&selected.custom?'Saved custom theme':'Built-in preset';
   $('deleteTemplate').disabled=!(selected&&selected.custom);
   updateAccessibility();
   updateTemplatePreview();
@@ -1149,14 +1162,13 @@ function applyBuilderChange(){
   workingTheme.complexity=$('complexity').value;
   COLOR_FIELDS.forEach(([prop,colorId])=>{workingTheme[prop]=$(colorId).value.toUpperCase();});
   workingTheme.quoteBorder=workingTheme.divider;
-  workingTheme.note=`Custom ${workingTheme.complexity.toLowerCase()} template based on ${themes[baseThemeKey]?.name||'selected preset'}.`;
+  workingTheme.note=`Custom ${workingTheme.complexity.toLowerCase()} theme based on ${themes[baseThemeKey]?.name||'selected preset'}.`;
   updateThemeUI(false);updateAccessibility();
   previewDirty=false;$('previewDirty').classList.add('hidden');generate();
 }
 function selectTheme(key){
   baseThemeKey=key;
   workingTheme=cloneTheme(themes[key]||themes[DEFAULT_THEME]);
-  $('themeNote').textContent=workingTheme.note;
   fillThemeControls();
   updateThemeUI(false);
   previewDirty=false;$('previewDirty').classList.add('hidden');generate();
@@ -1175,15 +1187,15 @@ function templatePayload(t){
 }
 function validateTemplateObject(obj){
   const t=obj&&obj.template?obj.template:obj;
-  if(!t||typeof t!=='object')return {ok:false,error:'Template data is missing.'};
+  if(!t||typeof t!=='object')return {ok:false,error:'Theme data is missing.'};
   const required=['name','complexity','primary','accent','h3','h3Text','calloutBg','calloutBorder','cardBg','divider'];
   const missing=required.filter(k=>!t[k]);
-  if(missing.length)return {ok:false,error:`Template is missing: ${missing.join(', ')}.`};
+  if(missing.length)return {ok:false,error:`Theme is missing: ${missing.join(', ')}.`};
   if(!['Native','Light','Structured','Rich'].includes(t.complexity))return {ok:false,error:'Complexity must be Native, Light, Structured, or Rich.'};
   const colorKeys=['primary','accent','h3','h3Text','calloutBg','calloutBorder','cardBg','divider'];
-  if(colorKeys.some(k=>!validHex(t[k])))return {ok:false,error:'One or more template colors are not valid six-digit hex colors.'};
+  if(colorKeys.some(k=>!validHex(t[k])))return {ok:false,error:'One or more theme colors are not valid six-digit hex colors.'};
   return {ok:true,theme:{
-    name:String(t.name).trim()||'Imported Template',complexity:t.complexity,note:String(t.note||'Imported template.'),
+    name:String(t.name).trim()||'Imported Theme',complexity:t.complexity,note:String(t.note||'Imported theme.'),
     primary:normalizeHex(t.primary),accent:normalizeHex(t.accent),h3:normalizeHex(t.h3),h3Text:normalizeHex(t.h3Text),
     calloutBg:normalizeHex(t.calloutBg),calloutBorder:normalizeHex(t.calloutBorder),cardBg:normalizeHex(t.cardBg),
     quoteBorder:validHex(t.quoteBorder||'')?normalizeHex(t.quoteBorder):normalizeHex(t.divider),divider:normalizeHex(t.divider),custom:true
@@ -1195,23 +1207,21 @@ function downloadJson(filename,obj){
   a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();
   setTimeout(()=>URL.revokeObjectURL(url),500);
 }
-function safeFileName(name){return name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'course-studio-template';}
+function safeFileName(name){return name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'course-studio-theme';}
 
 function updateThemeUI(refill=true){
   const t=currentTheme();
-  $('themeNote').textContent=t.note;
   if(refill)fillThemeControls();
 
   // Section styling is distinct from the standalone Card component.
   // Use audience-facing language instead of implementation terms.
   const sectionOption=$('sectionStyleOption');
-  if(['Native','Light'].includes(t.complexity)){
-    sectionOption.classList.add('hidden');
-  }else{
-    sectionOption.classList.remove('hidden');
+  const showSectionControl=advancedEnabled() && !['Native','Light'].includes(t.complexity);
+  sectionOption.classList.toggle('hidden',!showSectionControl);
+  if(showSectionControl){
     $('sectionStyleLabel').textContent=t.complexity==='Structured'
-      ? 'Use outlined section containers'
-      : 'Use card-style section containers';
+      ? 'Outlined sections'
+      : 'Card sections';
   }
   const isNative=t.complexity==='Native';
   if($('themeColorControls'))$('themeColorControls').classList.toggle('hidden',isNative);
@@ -1249,7 +1259,7 @@ $('loadDvcPresets').addEventListener('click',()=>{
   try{localStorage.setItem(DVC_PACK_ENABLED_KEY,'true');}catch(e){}
   saveCustomThemes();
   rebuildThemeOptions($('theme').value||DEFAULT_THEME);
-  $('templateStatus').textContent='Added DVC Green presets. They now appear under Custom templates.';
+  $('templateStatus').textContent='Added DVC Green presets. They now appear under Custom themes.';
 });
 
 $('resetTemplate').addEventListener('click',()=>{
@@ -1261,9 +1271,9 @@ $('resetTemplate').addEventListener('click',()=>{
 
 $('saveTemplate').addEventListener('click',()=>{
   const name=$('templateName').value.trim();
-  if(!name){$('templateStatus').textContent='Enter a name for the custom template first.';return;}
+  if(!name){$('templateStatus').textContent='Enter a name for the custom theme first.';return;}
   const key=makeCustomKey(name);
-  themes[key]={...cloneTheme(currentTheme()),name,custom:true,note:`Custom ${currentTheme().complexity.toLowerCase()} template.`};
+  themes[key]={...cloneTheme(currentTheme()),name,custom:true,note:`Custom ${currentTheme().complexity.toLowerCase()} theme.`};
   saveCustomThemes();rebuildThemeOptions(key);baseThemeKey=key;workingTheme=cloneTheme(themes[key]);
   fillThemeControls();updateThemeUI(false);generate();
   $('templateStatus').textContent=`Saved “${name}” in this browser.`;
@@ -1287,7 +1297,7 @@ $('duplicateTemplate').addEventListener('click',()=>{
   const source=cloneTheme(currentTheme());
   const proposed=$('templateName').value.trim()||`${source.name} — Copy`;
   const key=makeCustomKey(proposed);
-  themes[key]={...source,name:proposed,custom:true,note:`Custom ${source.complexity.toLowerCase()} template duplicated from ${source.name}.`};
+  themes[key]={...source,name:proposed,custom:true,note:`Custom ${source.complexity.toLowerCase()} theme duplicated from ${source.name}.`};
   saveCustomThemes();rebuildThemeOptions(key);baseThemeKey=key;workingTheme=cloneTheme(themes[key]);
   fillThemeControls();updateThemeUI(false);generate();$('templateName').value='';
   $('templateStatus').textContent=`Created custom copy “${proposed}”.`;
@@ -1312,7 +1322,7 @@ $('importTemplateFile').addEventListener('change',async()=>{
     fillThemeControls();updateThemeUI(false);generate();
     const allPass=$('accessSummary').classList.contains('pass');
     $('templateStatus').textContent=allPass?`Imported “${t.name}”. Accessibility text checks pass.`:`Imported “${t.name}”. Review the accessibility warnings before using it.`;
-  }catch(e){$('templateStatus').textContent='Import failed: the selected file is not valid template JSON.';}
+  }catch(e){$('templateStatus').textContent='Import failed: the selected file is not valid theme JSON.';}
   finally{$('importTemplateFile').value='';}
 });
 
@@ -1383,7 +1393,7 @@ function studioBackupPayload(){
     format:STUDIO_BACKUP_FORMAT,
     version:STUDIO_BACKUP_VERSION,
     exportedAt:new Date().toISOString(),
-    appVersion:'0.9.18',
+    appVersion:'0.9.19',
     customTemplates:collectCustomThemes(),
     customSnippets:collectCustomSnippets(),
     preferences:collectPreferences()
@@ -1398,7 +1408,7 @@ function validSnippetObject(sn){
 function validateStudioBackup(obj){
   if(!obj||obj.format!==STUDIO_BACKUP_FORMAT)return {ok:false,error:'This file is not a Course Studio full backup.'};
   if(obj.version!==STUDIO_BACKUP_VERSION)return {ok:false,error:`Unsupported backup version: ${obj.version}.`};
-  if(!obj.customTemplates||typeof obj.customTemplates!=='object'||Array.isArray(obj.customTemplates))return {ok:false,error:'Backup is missing customTemplates.'};
+  if(!obj.customTemplates||typeof obj.customTemplates!=='object'||Array.isArray(obj.customTemplates))return {ok:false,error:'Backup is missing custom themes.'};
   if(!obj.customSnippets||typeof obj.customSnippets!=='object'||Array.isArray(obj.customSnippets))return {ok:false,error:'Backup is missing customSnippets.'};
   const checkedThemes={};
   for(const [key,t] of Object.entries(obj.customTemplates)){
@@ -1503,7 +1513,7 @@ $('restoreStudioBackupFile').addEventListener('change',async()=>{
     const checked=validateStudioBackup(parsed);
     if(!checked.ok){$('restoreStatus').textContent=`Restore failed: ${checked.error}`;return;}
     const tCount=Object.keys(checked.themes).length,sCount=Object.keys(checked.snippets).length;
-    if(!confirm(`Restore ${tCount} custom template(s) and ${sCount} custom snippet(s)? This replaces the custom data currently saved in this browser.`)){
+    if(!confirm(`Restore ${tCount} custom theme(s) and ${sCount} custom snippet(s)? This replaces the custom data currently saved in this browser.`)){
       $('restoreStatus').textContent='Restore canceled.';return;
     }
     replaceCustomData(checked);
