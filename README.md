@@ -6,7 +6,7 @@ It uses simple markup and a live preview to generate Canvas-ready HTML. Users ca
 
 ## Current version
 
-**v0.9.21**
+**v0.9.22**
 
 The current source is available in this repository as [`canvas_course_studio.html`](canvas_course_studio.html).
 
@@ -88,7 +88,7 @@ Canvas Course Studio was developed using ChatGPT as an independent faculty tool 
 
 ## License
 
-The software is licensed under the [MIT License](LICENSE).
+The software is licensed under the [GNU Affero General Public License v3.0 (AGPL-3.0)](LICENSE).
 
 Documentation and sample content are licensed under **Creative Commons Attribution 4.0 International (CC BY 4.0)**.
 
