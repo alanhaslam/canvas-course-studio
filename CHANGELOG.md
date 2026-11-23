@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.9.22
+
+- Changed the software license from MIT to the GNU Affero General Public License v3.0 (AGPL-3.0). Releases v0.9.21 and earlier remain available under the MIT License.
+
+- Added license and source notices to the app's About section and the top of the HTML file.
 ## v0.9.21
 
 - Reworked the top workspace header so Theme and Advanced controls use previously empty header space and align with the Build/Preview two-column layout.
